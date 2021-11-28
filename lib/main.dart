@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'home.dart';
 import 'iapotheca_theme.dart';
+import 'report.dart';
 
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
@@ -27,10 +28,10 @@ Future<void> main() async {
   //     ),
   //   ),
   // );
-  runApp(
-    const HomeScreen()
-  );
+  // runApp(const HomeScreen());
+  runApp(const SessionReportScreen());
 }
+
 class HomeScreen extends StatelessWidget {
   // 2
   const HomeScreen({Key? key}) : super(key: key);
@@ -38,9 +39,26 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = iApothecaTheme.light();
     return MaterialApp(
-      theme:theme,
+      theme: theme,
       title: 'CountrAI',
       home: const Home(),
+    );
+  }
+}
+
+class SessionReportScreen extends StatelessWidget {
+  const SessionReportScreen({Key? key}) : super(key: key);
+  static const String _title = 'Session Report';
+  @override
+  Widget build(BuildContext context) {
+    final theme = iApothecaTheme.light();
+    return MaterialApp(
+      theme: theme,
+      title: '_title',
+      home: Scaffold(
+        appBar: AppBar(title: const Text(_title)),
+        body: const SessionReport(),
+      ),
     );
   }
 }
