@@ -7,27 +7,27 @@ class iApothecaTheme {
     bodyText1: GoogleFonts.rubik(
       fontSize: 14.0,
       fontWeight: FontWeight.w700,
-      color: Colors.black,
+      color: Colors.blue,
     ),
     headline1: GoogleFonts.rubik(
       fontSize: 32.0,
       fontWeight: FontWeight.bold,
-      color: Colors.black,
+      color: Colors.blue,
     ),
     headline2: GoogleFonts.rubik(
       fontSize: 21.0,
       fontWeight: FontWeight.w700,
-      color: Colors.black,
+      color: Colors.blue,
     ),
     headline3: GoogleFonts.rubik(
       fontSize: 16.0,
       fontWeight: FontWeight.w600,
-      color: Colors.black,
+      color: Colors.blue,
     ),
     headline6: GoogleFonts.rubik(
       fontSize: 20.0,
       fontWeight: FontWeight.w600,
-      color: Colors.black,
+      color: Colors.blue,
     ),
   );
 
@@ -72,8 +72,8 @@ class iApothecaTheme {
         ),
       ),
       appBarTheme: const AppBarTheme(
-        foregroundColor: Colors.black,
-        backgroundColor: Colors.white,
+        foregroundColor: Colors.orange,
+        backgroundColor: Colors.blue,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         foregroundColor: Colors.white,

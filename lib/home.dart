@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // 1
 class Home extends StatefulWidget {
@@ -14,19 +15,40 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Fooderlich',
-          // 2
-          style: Theme.of(context).textTheme.headline6,
+        appBar: AppBar(
+          title: Text(
+            'CountrAI',
+            // 2
+            style: Theme.of(context).textTheme.headline6,
+          ),
         ),
-      ),
-      // TODO: Show selected tab
-      body: Center(
-          child: Text('Let\'s get cooking 👩‍🍳',
-              // 3
-              style: Theme.of(context).textTheme.headline1)),
-      // TODO: Add bottom navigation bar
-    );
+        // TODO: Show selected tab
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TextFormField(
+                keyboardType: TextInputType.number,
+                initialValue: '000000',
+                maxLength: 6,
+                decoration: InputDecoration(
+                  labelText: 'Enter DIN for Pill',
+                  errorText: null,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Respond to button press
+                },
+                child: Text('Search'),
+              ),
+            ],
+          ),
+        )
+
+        // TODO: Add bottom navigation bar
+        );
   }
 }
