@@ -22,7 +22,8 @@ class PillInformation {
 }
 
 Future<PillInformation> fetchPillInformation(String din) async {
-  final response = await http.get(Uri.parse('https://health-products.canada.ca/api/drug/drugproduct/?din='+din));
+  final response = await http.get(Uri.parse(
+      'https://health-products.canada.ca/api/drug/drugproduct/?din=' + din));
   final jsonresponse = jsonDecode(response.body);
   if (response.statusCode == 200) {
     return PillInformation.fromJson(jsonresponse[0]);
