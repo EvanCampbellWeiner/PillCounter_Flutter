@@ -73,7 +73,7 @@ class iApothecaTheme {
         ),
       ),
       appBarTheme: const AppBarTheme(
-        foregroundColor: Colors.orange,
+        foregroundColor: Colors.white,
         backgroundColor: Colors.blue,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
