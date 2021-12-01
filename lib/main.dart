@@ -8,16 +8,15 @@ import 'home.dart';
 import 'iapotheca_theme.dart';
 import 'report.dart';
 
+List<CameraDescription> cameras = [];
+
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
   // can be called before `runApp()`
-  // WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   // // Obtain a list of the available cameras on the device.
-  // final cameras = await availableCameras();
-
-  // // Get a specific camera from the list of available cameras.
-  // final firstCamera = cameras.first;
+  cameras = await availableCameras();
 
   // runApp(
   //   MaterialApp(
@@ -28,8 +27,8 @@ Future<void> main() async {
   //     ),
   //   ),
   // );
-  // runApp(const HomeScreen());
-  runApp(const SessionReportScreen());
+  runApp(const HomeScreen());
+  // runApp(const SessionReportScreen());
 }
 
 class HomeScreen extends StatelessWidget {

@@ -25,6 +25,7 @@ class _HomeState extends State<Home> {
       });
     });
     super.initState();
+    _futurePillInformation = fetchPillInformation(_dinController.text);
   }
 
   @override
@@ -55,9 +56,10 @@ class _HomeState extends State<Home> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    _futurePillInformation = fetchPillInformation(_dinController.text);
-                  });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PillInformationForm()),
+                  );
                 },
                 child: Text('Search'),
               ),
