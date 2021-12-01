@@ -18,7 +18,8 @@ class _HomeState extends State<Home> {
   String _din = '00326925';
   late Future<PillInformation> _futurePillInformation;
 
-  @override void initState() {
+  @override
+  void initState() {
     _dinController.addListener(() {
       setState(() {
         _din = _dinController.text;
@@ -56,24 +57,24 @@ class _HomeState extends State<Home> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    _futurePillInformation = fetchPillInformation(_dinController.text);
+                    _futurePillInformation =
+                        fetchPillInformation(_dinController.text);
                   });
                 },
                 child: Text('Search'),
               ),
               FutureBuilder<PillInformation>(
-                future: _futurePillInformation,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data!.description);
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  }
+                  future: _futurePillInformation,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(snapshot.data!.description);
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
 
-                  // By default, show a loading spinner.
-                  return const CircularProgressIndicator();
-                }
-              ),
+                    // By default, show a loading spinner.
+                    return const CircularProgressIndicator();
+                  }),
             ],
           ),
         )
