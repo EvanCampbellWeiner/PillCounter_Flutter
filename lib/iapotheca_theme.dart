@@ -28,7 +28,7 @@ class iApothecaTheme {
     headline6: GoogleFonts.rubik(
       fontSize: 20.0,
       fontWeight: FontWeight.w600,
-      color: Colors.blue,
+      color: Colors.white,
     ),
   );
 

@@ -6,6 +6,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'main.dart';
+import 'camerawidgets.dart';
+
 
 class PillInformation {
   final String din;
@@ -63,10 +65,10 @@ class _PillInformationFormState extends State<PillInformationForm> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'CountrAI',
+            'Confirm Pill Information',
             // 2
-            style: Theme.of(context).textTheme.headline6,
           ),
+          centerTitle: true,
         ),
         // TODO: Show selected tab
         body: Center(

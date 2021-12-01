@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'pillinformation.dart';
+import 'report.dart';
+import 'iapotheca_theme.dart';
+
 
 // 1
 class Home extends StatefulWidget {
@@ -31,15 +34,12 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = iApothecaTheme.light();
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            'CountrAI',
-            // 2
-            style: Theme.of(context).textTheme.headline6,
-          ),
+          title: const Text('Pill Counter'),
+          centerTitle: true,
         ),
-        // TODO: Show selected tab
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -78,9 +78,8 @@ class _HomeState extends State<Home> {
                   }),
             ],
           ),
-        )
+        ),
 
-        // TODO: Add bottom navigation bar
         );
   }
 }
