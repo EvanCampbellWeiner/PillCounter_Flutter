@@ -28,7 +28,7 @@ Future<void> main() async {
   //   ),
   // );
   runApp(const HomeScreen());
-  // runApp(const SessionReportScreen());
+  //runApp(const SessionReportScreen());
 }
 
 class HomeScreen extends StatelessWidget {
@@ -56,7 +56,7 @@ class SessionReportScreen extends StatelessWidget {
       title: '_title',
       home: Scaffold(
         appBar: AppBar(title: const Text(_title)),
-        body: const SessionReport(),
+        body: SessionReport(),
       ),
     );
   }

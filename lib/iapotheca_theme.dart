@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// ignore: camel_case_types
 class iApothecaTheme {
   // 1
   static TextTheme lightTextTheme = TextTheme(
@@ -66,13 +67,13 @@ class iApothecaTheme {
       brightness: Brightness.light,
       checkboxTheme: CheckboxThemeData(
         fillColor: MaterialStateColor.resolveWith(
-              (states) {
+          (states) {
             return Colors.black;
           },
         ),
       ),
       appBarTheme: const AppBarTheme(
-        foregroundColor: Colors.orange,
+        foregroundColor: Colors.white,
         backgroundColor: Colors.blue,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
