@@ -1,5 +1,5 @@
-name: introduction_to_flutter
-description: A new Flutter project.
+name: pillcounter_flutter
+description: A pill counting flutter app using computer vision and machine learning.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -34,7 +34,6 @@ dependencies:
   path_provider:
   path:
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -46,7 +45,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  
+
+  mockito: ^5.0.17
+  build_runner: ^2.1.7
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -58,7 +59,7 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
-flutter:
+flutter: 
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

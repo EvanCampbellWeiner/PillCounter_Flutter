@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:introduction_to_flutter/pillinformation.dart';
 import 'pillinformation.dart';
+import 'package:http/io_client.dart' as io;
 
 // Generate a list of pill Informations asynchronously.
 // Add 12 pill Informations to pillInformationList, waiting for a response
@@ -26,7 +26,8 @@ Future<List<PillInformation>> createPillInformationList() async {
   pillInformationList.add(PillInformation(description: "Name", din: "DIN"));
 
   for (int i = 0; i < pillDins.length; i++) {
-    pillInformationList.add(await fetchPillInformation(pillDins[i]));
+    pillInformationList
+        .add(await fetchPillInformation(pillDins[i], io.IOClient()));
   }
 
   return pillInformationList;
