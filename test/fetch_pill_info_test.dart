@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import '../lib/pillinformation.dart';
+import 'package:pillcounter_flutter/pillinformation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'fetch_pill_info_test.mocks.dart';
 

@@ -49,46 +49,44 @@ class _SessionReportState extends State<SessionReport> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: FutureBuilder<List<PillInformation>>(
-        future: createPillInformationList(),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+    return FutureBuilder<List<PillInformation>>(
+      future: createPillInformationList(),
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else {
+          if (!snapshot.hasData) {
+            return Container();
           } else {
-            if (!snapshot.hasData) {
-              return Container();
-            } else {
-              return ListView.separated(
-                itemBuilder: (BuildContext context, int index) {
-                  // if (index == 0){
-                  // return ListTile(
-                  //   title: Text(snapshot.data[index].description),
-                  //   subtitle: Text(snapshot.data[index].din),
-                  //   trailing: Row(children: <Widget>[
+            return ListView.separated(
+              itemBuilder: (BuildContext context, int index) {
+                // if (index == 0){
+                // return ListTile(
+                //   title: Text(snapshot.data[index].description),
+                //   subtitle: Text(snapshot.data[index].din),
+                //   trailing: Row(children: <Widget>[
+                //     Text(snapshot.data[index].count),
+                //   ],)
+                // );
+                // }
+                return ListTile(
+                  title: Text(snapshot.data[index].description),
+                  subtitle: Text(snapshot.data[index].din),
+                  // trailing: Row(
+                  //   children: <Widget>[
                   //     Text(snapshot.data[index].count),
-                  //   ],)
-                  // );
-                  // }
-                  return ListTile(
-                    title: Text(snapshot.data[index].description),
-                    subtitle: Text(snapshot.data[index].din),
-                    // trailing: Row(
-                    //   children: <Widget>[
-                    //     Text(snapshot.data[index].count),
-                    //   ],
-                    // )
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const Divider();
-                },
-                itemCount: snapshot.data.length,
-              );
-            }
+                  //   ],
+                  // )
+                );
+              },
+              separatorBuilder: (context, index) {
+                return const Divider();
+              },
+              itemCount: snapshot.data.length,
+            );
           }
-        },
-      ),
+        }
+      },
     );
   }
 }

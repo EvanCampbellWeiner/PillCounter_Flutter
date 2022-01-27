@@ -64,13 +64,13 @@ class SessionReportScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Home()),
+                      MaterialPageRoute(builder: (context) => const Home()),
                     );
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.add),
-                      Text(' New Count'),
+                     const Icon(Icons.add),
+                     const Text(' New Count'),
                     ],
                   )),
               ElevatedButton(
@@ -80,8 +80,8 @@ class SessionReportScreen extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    Icon(Icons.ios_share),
-                    Text(' Export'),
+                    const Icon(Icons.ios_share),
+                    const Text(' Export'),
                   ],
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,

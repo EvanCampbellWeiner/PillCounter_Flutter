@@ -1,5 +1,6 @@
+// ignore_for_file: slash_for_doc_comments
+
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
@@ -39,19 +40,21 @@ class PillInformation {
 // Flutter + Server-side projects: provide a http.IOClient
 Future<PillInformation> fetchPillInformation(
     String din, http.Client client) async {
-  final response = await client.get(Uri.parse(
-      'https://health-products.canada.ca/api/drug/drugproduct/?din=' + din));
-  final jsonresponse = jsonDecode(response.body);
-  if (response.statusCode == 200) {
-    PillInformation pillinfo = PillInformation.fromJson(jsonresponse[0]);
-    if (pillinfo.din == din) {
-      return PillInformation.fromJson(jsonresponse[0]);
+
+  try {
+    final response = await client.get(Uri.parse(
+        'https://health-products.canada.ca/api/drug/drugproduct/?din=' + din));
+    final jsonresponse = jsonDecode(response.body);
+
+    /// Check that the validity of the response
+    if ((response.statusCode == 200) && ((jsonresponse.length != 0))) {
+      PillInformation pillinfo = PillInformation.fromJson(jsonresponse[0]);
+      return pillinfo;
     } else {
-      throw Exception(
-          'DINS dont match'); // TODO: Handle incorrect response from API
+      return PillInformation(din: din, description: 'Unknown');
     }
-  } else {
-    throw Exception('Failed to load pill information');
+  } catch(e) {
+    return PillInformation(din: din, description: 'Unknown');
   }
 }
 
@@ -92,7 +95,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Confirm Pill Information',
           // 2
         ),
@@ -119,10 +122,10 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => PillInformationReview()),
+                      builder: (context) => const PillInformationReview()),
                 );
               },
-              child: Text('Search'),
+              child: const Text('Search'),
             ),
             FutureBuilder<PillInformation>(
                 future: _futurePillInformation,
@@ -163,7 +166,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                           TakePictureScreen(camera: cameras.first)),
                 );
               },
-              child: Text('Search'),
+              child: const Text('Search'),
             ),
             FutureBuilder<PillInformation>(
                 future: _futurePillInformation,
@@ -196,4 +199,98 @@ Future<CameraDescription> loadCamera() async {
   // // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
   return firstCamera;
+}
+
+/**
+
+  Pill Information DIN Component
+  Purpose: A component that has a textfield for a DIN and a button to retrieve results.
+
+*/
+
+class DINInputFormState extends State<DINInputForm> {
+  // Contains the form state
+  final _formKey = GlobalKey<FormState>();
+
+  // Contains the contents of the textFormField
+  final dinController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child:Column(
+        children: <Widget>[
+          TextFormField(
+            validator: (value) {
+              if( value == null || value.isEmpty || value.characters.length != 8) {
+                return 'Please enter a valid 8 digit DIN';
+              }
+              return null;
+            },
+            controller: dinController,
+            keyboardType: TextInputType.number,
+            maxLength: 8,
+            decoration: const InputDecoration(
+              labelText: 'Enter DIN for Pill',
+              errorText: null,
+              border: OutlineInputBorder(),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Validate returns true if the form is valid, or false otherwise.
+              if (_formKey.currentState!.validate()) {
+                // If the form is valid, display a snackbar. In the real world,
+                // you'd often call a server or save the information in a database.
+                try {
+                   final pillinfo =  await fetchPillInformation(dinController.text, io.IOClient());
+                  if(pillinfo.description != 'Unknown') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              TakePictureScreen(camera: cameras.first)),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const PillInformationReview()),
+                    );
+                  }
+
+                } catch (Exception) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PillInformationReview()),
+                  );
+                }
+              }
+            },
+            child: const Text('Submit'),
+          ),
+        ]
+      ),
+    );
+  }
+}
+
+
+/**
+
+    Pill Information DIN Component Stateless
+    Purpose: A component that has a textfield for a DIN and will gather api information based on the inputted value.
+
+ */
+
+class DINInputForm extends StatefulWidget {
+  const DINInputForm ({Key? key}) : super(key: key);
+
+  @override
+  DINInputFormState createState() {
+    return DINInputFormState();
+  }
 }
