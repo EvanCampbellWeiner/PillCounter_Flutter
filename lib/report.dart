@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:introduction_to_flutter/pillinformation.dart';
+import 'package:pillcounter_flutter/pillinformation.dart';
 import 'pillinformation.dart';
 
 // Generate a list of pill Informations asynchronously.
