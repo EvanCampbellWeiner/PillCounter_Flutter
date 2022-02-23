@@ -1,12 +1,19 @@
 import 'dart:async';
+//import 'dart:html';
+import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-
 import 'home.dart';
 import 'iapotheca_theme.dart';
 import 'report.dart';
+import 'tflitetest.dart';
+
+import 'package:tflite/tflite.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -18,7 +25,21 @@ Future<void> main() async {
   // // Obtain a list of the available cameras on the device.
   cameras = await availableCameras();
 
-  runApp(const HomeScreen());
+  runApp(const TfliteScreen());
+}
+
+class TfliteScreen extends StatelessWidget {
+  // 2
+  const TfliteScreen({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    final theme = iApothecaTheme.light();
+    return MaterialApp(
+      theme: theme,
+      title: 'CountrAI',
+      home: const TfliteTest(),
+    );
+  }
 }
 
 class HomeScreen extends StatelessWidget {
@@ -48,47 +69,40 @@ class SessionReportScreen extends StatelessWidget {
       theme: theme,
       title: '_title',
       home: Scaffold(
-        appBar: AppBar(
-            title: const Text(_title),
-            centerTitle: true),
-        body: SessionReport(),
-        bottomNavigationBar: Row(
-          children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Home()),
-              );
-            },
-            child: Row(
-                children: [
-                  Icon(Icons.add),
-                  Text(' New Count'),
-                ],
-            )
-
-          ),
-            ElevatedButton(
-              onPressed: () {
-                Share.share('I will put the export file here!', subject: 'Count of Pills');
-              },
-              child: Row(
+          appBar: AppBar(title: const Text(_title), centerTitle: true),
+          body: SessionReport(),
+          bottomNavigationBar: Row(
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Home()),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      Icon(Icons.add),
+                      Text(' New Count'),
+                    ],
+                  )),
+              ElevatedButton(
+                onPressed: () {
+                  Share.share('I will put the export file here!',
+                      subject: 'Count of Pills');
+                },
+                child: Row(
                   children: [
                     Icon(Icons.ios_share),
                     Text(' Export'),
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                ),
               ),
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.spaceAround ,
-
-        )
-
-      ),
-
+            ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          )),
     );
   }
 }

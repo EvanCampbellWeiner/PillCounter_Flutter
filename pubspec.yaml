@@ -1,5 +1,5 @@
-name: introduction_to_flutter
-description: A new Flutter project.
+name: pillcounter_flutter
+description: A pill counting flutter app using computer vision and machine learning.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -39,14 +39,19 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   image_picker: ^0.8.4+4
-  google_fonts: ^2.1.0
+  google_fonts: '2.1.1'
   http: ^0.13.4
   share_plus: ^3.0.4
+  opencv_4: ^1.0.0
+  tflite:  ^1.0.0
+  image: ^3.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   
+  mockito: ^5.0.17	
+  build_runner: ^2.1.7
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -65,10 +70,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+     - assets/ssd_mobilenet.tflite
+     - assets/ssd_mobilenet.txt
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
