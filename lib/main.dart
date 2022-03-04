@@ -10,6 +10,10 @@ import 'report.dart';
 
 List<CameraDescription> cameras = [];
 
+/**
+   Main | 
+   Purpose: Loads first homescreen with global settings.
+ */
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
   // can be called before `runApp()`
@@ -21,8 +25,12 @@ Future<void> main() async {
   runApp(const HomeScreen());
 }
 
+/**
+ HomeScreen | 
+ Purpose: HomeScreen contains theme, title and home screen information.
+ Returns an application that instantiates Home() from home.dart
+*/
 class HomeScreen extends StatelessWidget {
-  // 2
   const HomeScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -30,7 +38,7 @@ class HomeScreen extends StatelessWidget {
     return MaterialApp(
       theme: theme,
       title: 'CountrAI',
-      home: const Home(),
+      home: const Home(), // home.dart
     );
   }
 }
@@ -48,47 +56,40 @@ class SessionReportScreen extends StatelessWidget {
       theme: theme,
       title: '_title',
       home: Scaffold(
-        appBar: AppBar(
-            title: const Text(_title),
-            centerTitle: true),
-        body: SessionReport(),
-        bottomNavigationBar: Row(
-          children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Home()),
-              );
-            },
-            child: Row(
-                children: [
-                  Icon(Icons.add),
-                  Text(' New Count'),
-                ],
-            )
-
-          ),
-            ElevatedButton(
-              onPressed: () {
-                Share.share('I will put the export file here!', subject: 'Count of Pills');
-              },
-              child: Row(
+          appBar: AppBar(title: const Text(_title), centerTitle: true),
+          body: SessionReport(),
+          bottomNavigationBar: Row(
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Home()),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                     const Icon(Icons.add),
+                     const Text(' New Count'),
+                    ],
+                  )),
+              ElevatedButton(
+                onPressed: () {
+                  Share.share('I will put the export file here!',
+                      subject: 'Count of Pills');
+                },
+                child: Row(
                   children: [
-                    Icon(Icons.ios_share),
-                    Text(' Export'),
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                    const Icon(Icons.ios_share),
+                    const Text(' Export'),
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                ),
               ),
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.spaceAround ,
-
-        )
-
-      ),
-
+            ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          )),
     );
   }
 }
