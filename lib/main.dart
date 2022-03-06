@@ -17,6 +17,10 @@ import 'package:image/image.dart';
 
 List<CameraDescription> cameras = [];
 
+/**
+   Main | 
+   Purpose: Loads first homescreen with global settings.
+ */
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
   // can be called before `runApp()`
@@ -25,11 +29,15 @@ Future<void> main() async {
   // // Obtain a list of the available cameras on the device.
   cameras = await availableCameras();
 
-  runApp(const TfliteScreen());
+  runApp(const Home());
 }
 
+/**
+ HomeScreen | 
+ Purpose: HomeScreen contains theme, title and home screen information.
+ Returns an application that instantiates Home() from home.dart
+*/
 class HomeScreen extends StatelessWidget {
-  // 2
   const HomeScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -37,11 +45,12 @@ class HomeScreen extends StatelessWidget {
     return MaterialApp(
       theme: theme,
       title: 'CountrAI',
-      home: const Home(),
+      home: const Home(), // home.dart
     );
   }
 }
 
+/** TODO Remove this if it is deprecated / not the widget used anymore. Otherwise remove
 class SessionReportScreen extends StatelessWidget {
   SessionReportScreen({Key? key}) : super(key: key);
   static const String _title = 'Session Report';
@@ -63,13 +72,13 @@ class SessionReportScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Home()),
+                      MaterialPageRoute(builder: (context) => const Home()),
                     );
                   },
                   child: Row(
                     children: [
-                      Icon(Icons.add),
-                      Text(' New Count'),
+                     const Icon(Icons.add),
+                     const Text(' New Count'),
                     ],
                   )),
               ElevatedButton(
@@ -79,8 +88,8 @@ class SessionReportScreen extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    Icon(Icons.ios_share),
-                    Text(' Export'),
+                    const Icon(Icons.ios_share),
+                    const Text(' Export'),
                   ],
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -92,3 +101,4 @@ class SessionReportScreen extends StatelessWidget {
     );
   }
 }
+*/
