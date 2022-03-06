@@ -4,7 +4,7 @@ import 'iapotheca_theme.dart';
 
 /**
  * Home Class | 
- * Purpose: Constructs and contains the State for Home. 
+ * Purpose: Constructs and contains the State for Home.
  */
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
