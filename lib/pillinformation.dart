@@ -38,16 +38,16 @@ class PillInformation {
   }
 
   static Map<String, dynamic> toMap(PillInformation pill) => {
-    'drug_identification_number':pill.din,
-    'brand_name':pill.description,
-    'count': pill.count,
-  };
+        'drug_identification_number':pill.din,
+        'brand_name':pill.description,
+        'count': pill.count,
+      };
 
   static String encode(List<PillInformation> Pills) => json.encode(
-    Pills
-        .map<Map<String, dynamic>>((pill) => PillInformation.toMap(pill))
-        .toList(),
-  );
+        Pills
+            .map<Map<String, dynamic>>((pill) => PillInformation.toMap(pill))
+            .toList(),
+      );
 
   static List<PillInformation> decode(String pills) =>
       (json.decode(pills) as List<dynamic>)
@@ -64,6 +64,7 @@ Future<PillInformation> fetchPillInformation(
     final response = await client.get(Uri.parse(
         'https://health-products.canada.ca/api/drug/drugproduct/?din=' + din));
     final jsonresponse = jsonDecode(response.body);
+
     /// Check that the validity of the response
     if ((response.statusCode == 200) && ((jsonresponse != 0))) {
       PillInformation pillinfo = PillInformation.fromJson(jsonresponse[0]);
@@ -97,6 +98,7 @@ class PillInformationReview extends StatefulWidget {
 class _PillInformationReviewState extends State<PillInformationReview> {
   final _dinTextInputController = TextEditingController();
   final _descTextInputController = TextEditingController();
+  final _cntTextInputController = TextEditingController();
 
   @override
   void initState() {
@@ -110,6 +112,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
         ModalRoute.of(context)!.settings.arguments as PillInformation;
     _dinTextInputController.text = pillinfo.din;
     _descTextInputController.text = pillinfo.description;
+    _cntTextInputController.text = pillinfo.count.toString();
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -148,23 +151,28 @@ class _PillInformationReviewState extends State<PillInformationReview> {
             SizedBox(height: 25),
             TextField(
               //enabled: false,
-              //controller: _descTextInputController,
+              controller: _cntTextInputController,
               keyboardType: TextInputType.number,
               maxLength: 3,
               decoration: InputDecoration(
                 labelText: "Count",
-                hintText: "Enter the count",
+                hintText: "0",
                 errorText: null,
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 25),
             ElevatedButton(
-              onPressed: () async  {
-                final SharedPreferences prefs = await SharedPreferences.getInstance();
+              onPressed: () async {
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
                 final String? pillReportString = prefs.getString('pillcounts');
-                final List<PillInformation> pillReport = PillInformation.decode(pillReportString ?? "");
-                pillReport.add(PillInformation(din: _dinTextInputController.text, description: _descTextInputController.text, count:0));
+                final List<PillInformation> pillReport =
+                    PillInformation.decode(pillReportString ?? "");
+                pillReport.add(PillInformation(
+                    din: _dinTextInputController.text,
+                    description: _descTextInputController.text,
+                    count: 0));
                 final String result = PillInformation.encode(pillReport);
                 await prefs.setString('pillcounts', (result));
                 Navigator.push(
@@ -260,8 +268,9 @@ class DINInputFormState extends State<DINInputForm> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => PillInformationReview(),
-                      settings: RouteSettings(arguments: PillInformation(din: "00000000", description: "Error"))
-                ),
+                      settings: RouteSettings(
+                          arguments: PillInformation(
+                              din: "00000000", description: "Error"))),
                 );
               }
             }
