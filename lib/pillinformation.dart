@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:html';
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -62,8 +63,9 @@ Future<PillInformation> fetchPillInformation(
    Purpose: Constructs and contains the state for the pill information review page
 */
 class PillInformationReview extends StatefulWidget {
-
-  PillInformationReview({Key? key,}) : super(key : key);
+  PillInformationReview({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _PillInformationReviewState createState() => _PillInformationReviewState();
@@ -79,14 +81,14 @@ class _PillInformationReviewState extends State<PillInformationReview> {
   final _descTextInputController = TextEditingController();
   @override
   void initState() {
-    setState(() {
-    });
+    setState(() {});
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final pillinfo = ModalRoute.of(context)!.settings.arguments as PillInformation;
+    final pillinfo =
+        ModalRoute.of(context)!.settings.arguments as PillInformation;
     _dinTextInputController.text = pillinfo.din;
     _descTextInputController.text = pillinfo.description;
     return Scaffold(
@@ -97,7 +99,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
         ),
         centerTitle: true,
       ),
-     body:  Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,7 +115,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               ),
             ),
             // KYLE (another text form field for the description)
-            SizedBox(height: 30),
+            SizedBox(height: 25),
             TextFormField(
               controller: _descTextInputController,
               keyboardType: TextInputType.text,
@@ -124,8 +126,9 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 30),
-            TextFormField(
+            SizedBox(height: 25),
+            TextField(
+              //enabled: false,
               //controller: _descTextInputController,
               keyboardType: TextInputType.number,
               maxLength: 3,
@@ -136,7 +139,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 25),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -212,7 +215,8 @@ class DINInputFormState extends State<DINInputForm> {
               // If the form is valid, display a snackbar. In the real world,
               // you'd often call a server or save the information in a database.
               try {
-                PillInformation pillinfo = PillInformation(din:"", description:"");
+                PillInformation pillinfo =
+                    PillInformation(din: "", description: "");
                 await fetchPillInformation(dinController.text, io.IOClient())
                     .then((PillInformation result) {
                   setState(() {
@@ -230,10 +234,8 @@ class DINInputFormState extends State<DINInputForm> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          PillInformationReview(),
-                            settings: RouteSettings(arguments: pillinfo)
-                          ),
+                      builder: (context) => PillInformationReview(),
+                      settings: RouteSettings(arguments: pillinfo)),
                 );
                 // }
               } catch (Exception) {
