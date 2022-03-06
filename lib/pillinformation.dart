@@ -169,7 +169,8 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               keyboardType: TextInputType.number,
               maxLength: 8,
               decoration: InputDecoration(
-                labelText: Text(pillinfo.din),
+                labelText: "DIN",
+                hintText: "Enter a DIN",
                 errorText: null,
                 border: OutlineInputBorder(),
               ),
@@ -180,8 +181,21 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               //controller: _descTextInputController,
               keyboardType: TextInputType.text,
               maxLength: 100,
-              decoration: const InputDecoration(
-                labelText: 'Description',
+              decoration: InputDecoration(
+                labelText: "Description",
+                hintText: "Enter a description",
+                errorText: null,
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 30),
+            TextFormField(
+              //controller: _descTextInputController,
+              keyboardType: TextInputType.number,
+              maxLength: 3,
+              decoration: InputDecoration(
+                labelText: "Count",
+                hintText: "Enter the count",
                 errorText: null,
                 border: OutlineInputBorder(),
               ),
