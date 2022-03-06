@@ -1,12 +1,19 @@
 import 'dart:async';
+//import 'dart:html';
+import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-
 import 'home.dart';
 import 'iapotheca_theme.dart';
 import 'report.dart';
+import 'tflitetest.dart';
+
+import 'package:tflite/tflite.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -22,7 +29,7 @@ Future<void> main() async {
   // // Obtain a list of the available cameras on the device.
   cameras = await availableCameras();
 
-  runApp(const HomeScreen());
+  runApp(const Home());
 }
 
 /**
@@ -43,6 +50,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+/** TODO Remove this if it is deprecated / not the widget used anymore. Otherwise remove
 class SessionReportScreen extends StatelessWidget {
   SessionReportScreen({Key? key}) : super(key: key);
   static const String _title = 'Session Report';
@@ -93,3 +101,4 @@ class SessionReportScreen extends StatelessWidget {
     );
   }
 }
+*/

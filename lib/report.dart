@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pillcounter_flutter/pillinformation.dart';
 import 'pillinformation.dart';
 import 'package:http/io_client.dart' as io;
 
