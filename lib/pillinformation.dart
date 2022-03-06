@@ -75,40 +75,20 @@ class PillInformationReview extends StatefulWidget {
    Purpose: Creates a form to allow users to review pill information 
  */
 class _PillInformationReviewState extends State<PillInformationReview> {
-  //PillInformation pillinfo = PillInformation(din: "00000000", description: "Default");
-  String din = "";
-
-  // final _dinTextInputController = TextEditingController();
-  // final _descTextInputController = TextEditingController();
-
-  // late Future<PillInformation> _futurePillInformation;
-
+  final _dinTextInputController = TextEditingController();
+  final _descTextInputController = TextEditingController();
   @override
   void initState() {
     setState(() {
-      
     });
-
     super.initState();
-
-    //   _dinTextInputController.addListener(() {
-    //     setState(() {});
-    //   });
-
-    //   // KYLE
-    //   _descTextInputController.addListener(() {
-    //     setState(() {});
-    //   });
-
-    //   super.initState();
-    //   // We pass io.IOClient because it is a flutter/server-side project.
-    //   _futurePillInformation =
-    //       fetchPillInformation(_dinTextInputController.text, io.IOClient());
   }
 
   @override
   Widget build(BuildContext context) {
     final pillinfo = ModalRoute.of(context)!.settings.arguments as PillInformation;
+    _dinTextInputController.text = pillinfo.din;
+    _descTextInputController.text = pillinfo.description;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -117,59 +97,17 @@ class _PillInformationReviewState extends State<PillInformationReview> {
         ),
         centerTitle: true,
       ),
-      // TODO: Show selected tab
-      body: Center(
+     body:  Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextFormField(
-              //controller: _dinTextInputController,
-              keyboardType: TextInputType.number,
-              maxLength: 8,
-              decoration: const InputDecoration(
-                labelText: 'Y',
-                errorText: null,
-                border: OutlineInputBorder(),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          TakePictureScreen(camera: cameras.first)),
-                );
-              },
-              child: const Text('Search'),
-            ),
-            FutureBuilder<PillInformation>(
-                //future: _futurePillInformation,
-                builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(snapshot.data!.description);
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-
-              // By default, show a loading spinner.
-              return const CircularProgressIndicator();
-            }),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            TextFormField(
-              //controller: _dinTextInputController,
+              controller: _dinTextInputController,
               keyboardType: TextInputType.number,
               maxLength: 8,
               decoration: InputDecoration(
-                labelText: Text(pillinfo.din),
+                labelText: "DIN",
                 errorText: null,
                 border: OutlineInputBorder(),
               ),
@@ -177,7 +115,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
             // KYLE (another text form field for the description)
             SizedBox(height: 30),
             TextFormField(
-              //controller: _descTextInputController,
+              controller: _descTextInputController,
               keyboardType: TextInputType.text,
               maxLength: 100,
               decoration: const InputDecoration(
@@ -198,18 +136,6 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               },
               child: const Text('Okay'),
             ),
-            FutureBuilder<PillInformation>(
-                //future: _futurePillInformation,
-                builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(snapshot.data!.description);
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-
-              // By default, show a loading spinner.
-              return const CircularProgressIndicator();
-            }),
           ],
         ),
       ),
@@ -274,8 +200,7 @@ class DINInputFormState extends State<DINInputForm> {
               // If the form is valid, display a snackbar. In the real world,
               // you'd often call a server or save the information in a database.
               try {
-                PillInformation pillinfo =
-                    PillInformation(din: "00000000", description: "Error");
+                PillInformation pillinfo = PillInformation(din:"", description:"");
                 await fetchPillInformation(dinController.text, io.IOClient())
                     .then((PillInformation result) {
                   setState(() {
