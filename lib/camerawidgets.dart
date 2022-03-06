@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:pillcounter_flutter/report.dart';
 import 'main.dart';
 import 'dart:io';
 
@@ -141,7 +142,7 @@ class _DisplayPictureScreen extends State<DisplayPictureScreen> {
       if (index == 1) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => SessionReportScreen()),
+          MaterialPageRoute(builder: (context) => SessionReport()),
         );
       }
       _selectedIndex = index;

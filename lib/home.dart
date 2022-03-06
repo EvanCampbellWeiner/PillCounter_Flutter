@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final theme = iApothecaTheme.light();
-    return Scaffold(
+    return MaterialApp(home: Scaffold(
       appBar: AppBar(
         title: const Text('Pill Counter'),
         centerTitle: true,
@@ -37,11 +37,11 @@ class _HomeState extends State<Home> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+          children: const [
             DINInputForm(),
           ],
         ),
       ),
-    );
+    ));
   }
 }
