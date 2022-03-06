@@ -28,20 +28,6 @@ Future<void> main() async {
   runApp(const TfliteScreen());
 }
 
-class TfliteScreen extends StatelessWidget {
-  // 2
-  const TfliteScreen({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    final theme = iApothecaTheme.light();
-    return MaterialApp(
-      theme: theme,
-      title: 'CountrAI',
-      home: const TfliteTest(),
-    );
-  }
-}
-
 class HomeScreen extends StatelessWidget {
   // 2
   const HomeScreen({Key? key}) : super(key: key);
