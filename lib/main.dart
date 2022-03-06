@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
     return MaterialApp(
       theme: theme,
       title: 'CountrAI',
-      home: const PillInformationReview(), // home.dart KYLE (added pill in params)
+      home: const Home(), // home.dart KYLE (added pill in params)
     );
   }
 }

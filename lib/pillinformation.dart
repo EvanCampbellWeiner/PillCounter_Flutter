@@ -62,7 +62,8 @@ Future<PillInformation> fetchPillInformation(
    Purpose: Constructs and contains the state for the pill information review page
 */
 class PillInformationReview extends StatefulWidget {
-  const PillInformationReview({Key? key}) : super(key: key);
+
+  PillInformationReview({Key? key,}) : super(key : key);
 
   @override
   _PillInformationReviewState createState() => _PillInformationReviewState();
@@ -74,30 +75,40 @@ class PillInformationReview extends StatefulWidget {
    Purpose: Creates a form to allow users to review pill information 
  */
 class _PillInformationReviewState extends State<PillInformationReview> {
-  final _dinTextInputController = TextEditingController();
-  final _descTextInputController = TextEditingController();
+  //PillInformation pillinfo = PillInformation(din: "00000000", description: "Default");
+  String din = "";
 
-  late Future<PillInformation> _futurePillInformation;
+  // final _dinTextInputController = TextEditingController();
+  // final _descTextInputController = TextEditingController();
+
+  // late Future<PillInformation> _futurePillInformation;
 
   @override
   void initState() {
-    _dinTextInputController.addListener(() {
-      setState(() {});
-    });
-
-    // KYLE
-    _descTextInputController.addListener(() {
-      setState(() {});
+    setState(() {
+      
     });
 
     super.initState();
-    // We pass io.IOClient because it is a flutter/server-side project.
-    _futurePillInformation =
-        fetchPillInformation(_dinTextInputController.text, io.IOClient());
+
+    //   _dinTextInputController.addListener(() {
+    //     setState(() {});
+    //   });
+
+    //   // KYLE
+    //   _descTextInputController.addListener(() {
+    //     setState(() {});
+    //   });
+
+    //   super.initState();
+    //   // We pass io.IOClient because it is a flutter/server-side project.
+    //   _futurePillInformation =
+    //       fetchPillInformation(_dinTextInputController.text, io.IOClient());
   }
 
   @override
   Widget build(BuildContext context) {
+    final pillinfo = ModalRoute.of(context)!.settings.arguments as PillInformation;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -113,7 +124,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextFormField(
-              controller: _dinTextInputController,
+              //controller: _dinTextInputController,
               keyboardType: TextInputType.number,
               maxLength: 8,
               decoration: const InputDecoration(
@@ -127,23 +138,24 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const PillInformationReview()),
+                      builder: (context) =>
+                          TakePictureScreen(camera: cameras.first)),
                 );
               },
               child: const Text('Search'),
             ),
             FutureBuilder<PillInformation>(
-                future: _futurePillInformation,
+                //future: _futurePillInformation,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data!.description);
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  }
+              if (snapshot.hasData) {
+                return Text(snapshot.data!.description);
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
 
-                  // By default, show a loading spinner.
-                  return const CircularProgressIndicator();
-                }),
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            }),
           ],
         ),
       ),
@@ -153,11 +165,11 @@ class _PillInformationReviewState extends State<PillInformationReview> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextFormField(
-              controller: _dinTextInputController,
+              //controller: _dinTextInputController,
               keyboardType: TextInputType.number,
               maxLength: 8,
-              decoration: const InputDecoration(
-                labelText: 'DIN',
+              decoration: InputDecoration(
+                labelText: Text(pillinfo.din),
                 errorText: null,
                 border: OutlineInputBorder(),
               ),
@@ -165,7 +177,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
             // KYLE (another text form field for the description)
             SizedBox(height: 30),
             TextFormField(
-              controller: _descTextInputController,
+              //controller: _descTextInputController,
               keyboardType: TextInputType.text,
               maxLength: 100,
               decoration: const InputDecoration(
@@ -187,17 +199,17 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               child: const Text('Okay'),
             ),
             FutureBuilder<PillInformation>(
-                future: _futurePillInformation,
+                //future: _futurePillInformation,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data!.description);
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  }
+              if (snapshot.hasData) {
+                return Text(snapshot.data!.description);
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
 
-                  // By default, show a loading spinner.
-                  return const CircularProgressIndicator();
-                }),
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            }),
           ],
         ),
       ),
@@ -262,28 +274,39 @@ class DINInputFormState extends State<DINInputForm> {
               // If the form is valid, display a snackbar. In the real world,
               // you'd often call a server or save the information in a database.
               try {
-                final pillinfo = await fetchPillInformation(
-                    dinController.text, io.IOClient());
-                if (pillinfo.description != 'Unknown') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            TakePictureScreen(camera: cameras.first)),
-                  );
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const PillInformationReview()),
-                  );
-                }
-              } catch (Exception) {
+                PillInformation pillinfo =
+                    PillInformation(din: "00000000", description: "Error");
+                await fetchPillInformation(dinController.text, io.IOClient())
+                    .then((PillInformation result) {
+                  setState(() {
+                    pillinfo = result;
+                  });
+                });
+                // if (pillinfo.description != 'Unknown') {
+                //   Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) =>
+                //             TakePictureScreen(camera: cameras.first)),
+                //   );
+                // } else {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => PillInformationReview()),
+                      builder: (context) =>
+                          PillInformationReview(),
+                            settings: RouteSettings(arguments: pillinfo)
+                          ),
                 );
+                // }
+              } catch (Exception) {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => PillInformationReview(
+                //           pillinfo: PillInformation(
+                //               din: "00000019", description: "Test Pill"))),
+                // );
               }
             }
           },
