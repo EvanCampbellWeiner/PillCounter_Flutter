@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:http/io_client.dart' as io;
 import 'main.dart';
 import 'camerawidgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /**
    Pill Information Class (Object)
@@ -17,7 +19,7 @@ import 'camerawidgets.dart';
 class PillInformation {
   final String din;
   final String description;
-  int count = 0;
+  int count;
 
   void increment() => count++;
   void decrement() => count--;
@@ -25,14 +27,33 @@ class PillInformation {
   PillInformation({
     required this.din,
     required this.description,
+    this.count = 0,
   });
 
   factory PillInformation.fromJson(Map<String, dynamic> json) {
     return PillInformation(
       din: json['drug_identification_number'],
       description: json['brand_name'],
+      count: json['count'] ?? 0,
     );
   }
+
+  static Map<String, dynamic> toMap(PillInformation pill) => {
+    'drug_identification_number':pill.din,
+    'brand_name':pill.description,
+    'count': pill.count,
+  };
+
+  static String encode(List<PillInformation> Pills) => json.encode(
+    Pills
+        .map<Map<String, dynamic>>((pill) => PillInformation.toMap(pill))
+        .toList(),
+  );
+
+  static List<PillInformation> decode(String pills) =>
+      (json.decode(pills) as List<dynamic>)
+          .map<PillInformation>((item) => PillInformation.fromJson(item))
+          .toList();
 }
 
 // Providing http.Client allows the application to provide the correct http.Client
@@ -44,16 +65,15 @@ Future<PillInformation> fetchPillInformation(
     final response = await client.get(Uri.parse(
         'https://health-products.canada.ca/api/drug/drugproduct/?din=' + din));
     final jsonresponse = jsonDecode(response.body);
-
     /// Check that the validity of the response
-    if ((response.statusCode == 200) && ((jsonresponse.length != 0))) {
+    if ((response.statusCode == 200) && ((jsonresponse != 0))) {
       PillInformation pillinfo = PillInformation.fromJson(jsonresponse[0]);
       return pillinfo;
     } else {
-      return PillInformation(din: din, description: 'Unknown');
+      return PillInformation(din: din, description: 'Could not find din');
     }
   } catch (e) {
-    return PillInformation(din: din, description: 'Unknown');
+    return PillInformation(din: din, description: 'CDD Error');
   }
 }
 
@@ -77,6 +97,7 @@ class PillInformationReview extends StatefulWidget {
 class _PillInformationReviewState extends State<PillInformationReview> {
   final _dinTextInputController = TextEditingController();
   final _descTextInputController = TextEditingController();
+
   @override
   void initState() {
     setState(() {
@@ -138,7 +159,13 @@ class _PillInformationReviewState extends State<PillInformationReview> {
             ),
             SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async  {
+                final SharedPreferences prefs = await SharedPreferences.getInstance();
+                final String? pillReportString = prefs.getString('pillcounts');
+                final List<PillInformation> pillReport = PillInformation.decode(pillReportString ?? "");
+                pillReport.add(PillInformation(din: _dinTextInputController.text, description: _descTextInputController.text, count:0));
+                final String result = PillInformation.encode(pillReport);
+                await prefs.setString('pillcounts', (result));
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -219,14 +246,6 @@ class DINInputFormState extends State<DINInputForm> {
                     pillinfo = result;
                   });
                 });
-                // if (pillinfo.description != 'Unknown') {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) =>
-                //             TakePictureScreen(camera: cameras.first)),
-                //   );
-                // } else {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -237,13 +256,13 @@ class DINInputFormState extends State<DINInputForm> {
                 );
                 // }
               } catch (Exception) {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => PillInformationReview(
-                //           pillinfo: PillInformation(
-                //               din: "00000019", description: "Test Pill"))),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PillInformationReview(),
+                      settings: RouteSettings(arguments: PillInformation(din: "00000000", description: "Error"))
+                ),
+                );
               }
             }
           },
