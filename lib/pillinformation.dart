@@ -118,8 +118,20 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               controller: _descTextInputController,
               keyboardType: TextInputType.text,
               maxLength: 100,
-              decoration: const InputDecoration(
-                labelText: 'Description',
+              decoration: InputDecoration(
+                labelText: "Description",
+                errorText: null,
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 30),
+            TextFormField(
+              //controller: _descTextInputController,
+              keyboardType: TextInputType.number,
+              maxLength: 3,
+              decoration: InputDecoration(
+                labelText: "Count",
+                hintText: "Enter the count",
                 errorText: null,
                 border: OutlineInputBorder(),
               ),
