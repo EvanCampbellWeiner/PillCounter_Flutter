@@ -10,16 +10,17 @@ import 'package:share_plus/share_plus.dart';
 import 'home.dart';
 import 'iapotheca_theme.dart';
 import 'report.dart';
-import 'camerawidgets.dart';
+// import 'camerawidgets.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 
 const String mobile = "MobileNet";
 const String ssd = "SSD MobileNet";
-const String yolo = "Tiny YOLOv2";
+const String yolo = "YOLO";
 const String deeplab = "DeepLab";
 const String posenet = "PoseNet";
+dynamic _pickImageError;
 
 class TfliteTest extends StatefulWidget {
   const TfliteTest({Key? key}) : super(key: key);
@@ -50,14 +51,27 @@ class _TfliteTestState extends State<TfliteTest> {
   }
 
   Future predictImagePicker() async {
+    print("predictImagePicker");
+
     var _picker = ImagePicker();
-
-    var image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image == null) return;
-    setState(() {
-      _busy = true;
-    });
-
+    var image = null;
+    try {
+      image = await _picker.pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 600,
+          maxHeight: 600,
+          imageQuality: 75);
+      print("test");
+      if (image == null) return;
+      setState(() {
+        _busy = true;
+      });
+    } catch (e) {
+      setState(() {
+        _pickImageError = e;
+        print(e);
+      });
+    }
     predictImage(File(image.path));
   }
 
@@ -66,6 +80,7 @@ class _TfliteTestState extends State<TfliteTest> {
 
     switch (_model) {
       case yolo:
+        print("yolo");
         await yolov2Tiny(image);
         break;
       case ssd:
@@ -78,6 +93,7 @@ class _TfliteTestState extends State<TfliteTest> {
         await poseNet(image);
         break;
       default:
+        print("default");
         await recognizeImage(image);
       // await recognizeImageBinary(image);
     }
@@ -104,8 +120,8 @@ class _TfliteTestState extends State<TfliteTest> {
       switch (_model) {
         case yolo:
           res = await Tflite.loadModel(
-            model: "assets/yolov2_tiny.tflite",
-            labels: "assets/yolov2_tiny.txt",
+            model: "assets/yolov5s.tflite",
+            labels: "assets/yolov5s.txt",
             // useGpuDelegate: true,
           );
           break;
