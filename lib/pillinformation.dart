@@ -40,7 +40,6 @@ class PillInformation {
 // Flutter + Server-side projects: provide a http.IOClient
 Future<PillInformation> fetchPillInformation(
     String din, http.Client client) async {
-
   try {
     final response = await client.get(Uri.parse(
         'https://health-products.canada.ca/api/drug/drugproduct/?din=' + din));
@@ -53,7 +52,7 @@ Future<PillInformation> fetchPillInformation(
     } else {
       return PillInformation(din: din, description: 'Unknown');
     }
-  } catch(e) {
+  } catch (e) {
     return PillInformation(din: din, description: 'Unknown');
   }
 }
@@ -69,19 +68,25 @@ class PillInformationReview extends StatefulWidget {
   _PillInformationReviewState createState() => _PillInformationReviewState();
 }
 
-//TODO: Create a From component consisting of TextFIeld components populated with Pill Information and present to user
+//TODO: Create a From component consisting of TextField components populated with Pill Information and present to user
 /**
    Pill Information Review State
    Purpose: Creates a form to allow users to review pill information 
  */
 class _PillInformationReviewState extends State<PillInformationReview> {
   final _dinTextInputController = TextEditingController();
+  final _descTextInputController = TextEditingController();
 
   late Future<PillInformation> _futurePillInformation;
 
   @override
   void initState() {
     _dinTextInputController.addListener(() {
+      setState(() {});
+    });
+
+    // KYLE
+    _descTextInputController.addListener(() {
       setState(() {});
     });
 
@@ -96,7 +101,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Confirm Pill Information',
+          'Pill Information',
           // 2
         ),
         centerTitle: true,
@@ -112,7 +117,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               keyboardType: TextInputType.number,
               maxLength: 8,
               decoration: const InputDecoration(
-                labelText: 'Enter DIN for Pill',
+                labelText: 'Y',
                 errorText: null,
                 border: OutlineInputBorder(),
               ),
@@ -152,11 +157,24 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               keyboardType: TextInputType.number,
               maxLength: 8,
               decoration: const InputDecoration(
-                labelText: 'Enter DIN for Pill',
+                labelText: 'DIN',
                 errorText: null,
                 border: OutlineInputBorder(),
               ),
             ),
+            // KYLE (another text form field for the description)
+            SizedBox(height: 30),
+            TextFormField(
+              controller: _descTextInputController,
+              keyboardType: TextInputType.text,
+              maxLength: 100,
+              decoration: const InputDecoration(
+                labelText: 'Description',
+                errorText: null,
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -166,7 +184,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                           TakePictureScreen(camera: cameras.first)),
                 );
               },
-              child: const Text('Search'),
+              child: const Text('Okay'),
             ),
             FutureBuilder<PillInformation>(
                 future: _futurePillInformation,
@@ -207,7 +225,6 @@ Future<CameraDescription> loadCamera() async {
   Purpose: A component that has a textfield for a DIN and a button to retrieve results.
 
 */
-
 class DINInputFormState extends State<DINInputForm> {
   // Contains the form state
   final _formKey = GlobalKey<FormState>();
@@ -219,65 +236,63 @@ class DINInputFormState extends State<DINInputForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child:Column(
-        children: <Widget>[
-          TextFormField(
-            validator: (value) {
-              if( value == null || value.isEmpty || value.characters.length != 8) {
-                return 'Please enter a valid 8 digit DIN';
-              }
-              return null;
-            },
-            controller: dinController,
-            keyboardType: TextInputType.number,
-            maxLength: 8,
-            decoration: const InputDecoration(
-              labelText: 'Enter DIN for Pill',
-              errorText: null,
-              border: OutlineInputBorder(),
-            ),
+      child: Column(children: <Widget>[
+        TextFormField(
+          validator: (value) {
+            if (value == null ||
+                value.isEmpty ||
+                value.characters.length != 8) {
+              return 'Please enter a valid 8 digit DIN';
+            }
+            return null;
+          },
+          controller: dinController,
+          keyboardType: TextInputType.number,
+          maxLength: 8,
+          decoration: const InputDecoration(
+            labelText: 'Enter DIN for Pill',
+            errorText: null,
+            border: OutlineInputBorder(),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              // Validate returns true if the form is valid, or false otherwise.
-              if (_formKey.currentState!.validate()) {
-                // If the form is valid, display a snackbar. In the real world,
-                // you'd often call a server or save the information in a database.
-                try {
-                   final pillinfo =  await fetchPillInformation(dinController.text, io.IOClient());
-                  if(pillinfo.description != 'Unknown') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              TakePictureScreen(camera: cameras.first)),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const PillInformationReview()),
-                    );
-                  }
-
-                } catch (Exception) {
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            // Validate returns true if the form is valid, or false otherwise.
+            if (_formKey.currentState!.validate()) {
+              // If the form is valid, display a snackbar. In the real world,
+              // you'd often call a server or save the information in a database.
+              try {
+                final pillinfo = await fetchPillInformation(
+                    dinController.text, io.IOClient());
+                if (pillinfo.description != 'Unknown') {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => PillInformationReview()),
+                        builder: (context) =>
+                            TakePictureScreen(camera: cameras.first)),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PillInformationReview()),
                   );
                 }
+              } catch (Exception) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PillInformationReview()),
+                );
               }
-            },
-            child: const Text('Submit'),
-          ),
-        ]
-      ),
+            }
+          },
+          child: const Text('Submit'),
+        ),
+      ]),
     );
   }
 }
-
 
 /**
 
@@ -285,9 +300,8 @@ class DINInputFormState extends State<DINInputForm> {
     Purpose: A component that has a textfield for a DIN and will gather api information based on the inputted value.
 
  */
-
 class DINInputForm extends StatefulWidget {
-  const DINInputForm ({Key? key}) : super(key: key);
+  const DINInputForm({Key? key}) : super(key: key);
 
   @override
   DINInputFormState createState() {
