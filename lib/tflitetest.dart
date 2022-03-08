@@ -2,11 +2,15 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:developer' as dev;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pillcounter_flutter/tensorflow2.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 import 'home.dart';
 import 'iapotheca_theme.dart';
 import 'report.dart';
@@ -14,6 +18,8 @@ import 'report.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
+import 'package:tflite_flutter/tflite_flutter.dart' as tfl;
+import 'classifier.dart';
 
 const String mobile = "MobileNet";
 const String ssd = "SSD MobileNet";
@@ -32,7 +38,7 @@ class TfliteTest extends StatefulWidget {
 class _TfliteTestState extends State<TfliteTest> {
   File? _image;
   List _recognitions = [];
-  String _model = ssd;
+  String _model = yolo;
   double _imageHeight = 0;
   double _imageWidth = 0;
   bool _busy = false;
@@ -61,7 +67,6 @@ class _TfliteTestState extends State<TfliteTest> {
           maxWidth: 600,
           maxHeight: 600,
           imageQuality: 75);
-      print("test");
       if (image == null) return;
       setState(() {
         _busy = true;
@@ -69,15 +74,18 @@ class _TfliteTestState extends State<TfliteTest> {
     } catch (e) {
       setState(() {
         _pickImageError = e;
+        dev.log("caught error");
         print(e);
       });
     }
+    dev.log("predicting image...");
     predictImage(File(image.path));
+    dev.log("fixed");
   }
 
   Future predictImage(File image) async {
     if (image == null) return;
-
+    dev.log("here");
     switch (_model) {
       case yolo:
         print("yolo");
@@ -223,29 +231,25 @@ class _TfliteTestState extends State<TfliteTest> {
   }
 
   Future yolov2Tiny(File image) async {
-    int startTime = new DateTime.now().millisecondsSinceEpoch;
-    var recognitions = await Tflite.detectObjectOnImage(
-      path: image.path,
-      model: "YOLO",
-      threshold: 0.3,
-      imageMean: 0.0,
-      imageStd: 255.0,
-      numResultsPerClass: 1,
-    );
+    dev.log("hello");
     // var imageBytes = (await rootBundle.load(image.path)).buffer;
-    // img.Image oriImage = img.decodeJpg(imageBytes.asUint8List());
-    // img.Image resizedImage = img.copyResize(oriImage, 416, 416);
-    // var recognitions = await Tflite.detectObjectOnBinary(
-    //   binary: imageToByteListFloat32(resizedImage, 416, 0.0, 255.0),
-    //   model: "YOLO",
-    //   threshold: 0.3,
-    //   numResultsPerClass: 1,
-    // );
-    setState(() {
-      _recognitions = recognitions!;
-    });
-    int endTime = new DateTime.now().millisecondsSinceEpoch;
-    print("Inference took ${endTime - startTime}ms");
+    // img.Image? oriImage = img.decodeJpg(imageBytes.asUint8List());
+    // img.Image resizedImage = img.copyResize(oriImage!, height: 640, width: 640);
+    Classifier classifier = await Classifier();
+    Interpreter interpreter = await Interpreter.fromAsset(
+      "yolov5s.tflite",
+      options: InterpreterOptions()..threads = 4,
+    );
+    var results = await classifier.predict(img.readJpg(image.readAsBytesSync())!);
+    // var results = classifier.predict(resizedImage);
+    interpreter.close();
+    if(classifier.interpreter !=null) {
+      classifier.interpreter!.close();
+    }
+
+
+    dev.log(results.toString());
+    dev.log("Finished");
   }
 
   Future ssdMobileNet(File image) async {
