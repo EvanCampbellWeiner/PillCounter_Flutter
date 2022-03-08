@@ -167,8 +167,12 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 final SharedPreferences prefs =
                     await SharedPreferences.getInstance();
                 final String? pillReportString = prefs.getString('pillcounts');
-                final List<PillInformation> pillReport =
-                    PillInformation.decode(pillReportString ?? "");
+                List<PillInformation> pillReport =
+                   pillReportString != null ? PillInformation.decode(pillReportString) : List.filled(1,PillInformation(
+                       din: _dinTextInputController.text,
+                       description: _descTextInputController.text,
+                       count: 0) , growable: true);
+
                 pillReport.add(PillInformation(
                     din: _dinTextInputController.text,
                     description: _descTextInputController.text,
