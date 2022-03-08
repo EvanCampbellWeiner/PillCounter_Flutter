@@ -231,25 +231,27 @@ class _TfliteTestState extends State<TfliteTest> {
   }
 
   Future yolov2Tiny(File image) async {
-    dev.log("hello");
     // var imageBytes = (await rootBundle.load(image.path)).buffer;
     // img.Image? oriImage = img.decodeJpg(imageBytes.asUint8List());
     // img.Image resizedImage = img.copyResize(oriImage!, height: 640, width: 640);
     Classifier classifier = await Classifier();
     Interpreter interpreter = await Interpreter.fromAsset(
-      "yolov5s.tflite",
+      "model.tflite",
       options: InterpreterOptions()..threads = 4,
     );
     var results = await classifier.predict(img.readJpg(image.readAsBytesSync())!);
+    // resizedImage = img.drawRect(resizedImage,results!.first.location.left,results!.first.location.top, results!.first.location.right, results!.first.location.bottom, 0  );
     // var results = classifier.predict(resizedImage);
+    _recognitions = results!;
     interpreter.close();
     if(classifier.interpreter !=null) {
       classifier.interpreter!.close();
     }
+    dev.log("end");
 
-
-    dev.log(results.toString());
-    dev.log("Finished");
+    setState(() {
+      _recognitions = results;
+    });
   }
 
   Future ssdMobileNet(File image) async {
@@ -326,12 +328,15 @@ class _TfliteTestState extends State<TfliteTest> {
     double factorX = screen.width;
     double factorY = _imageHeight / _imageWidth * screen.width;
     Color blue = Color.fromRGBO(37, 213, 253, 1.0);
+    dev.log("Render Boxes");
+    dev.log(_recognitions.toString());
     return _recognitions.map((re) {
+      Rect rec = re.renderLocation;
       return Positioned(
-        left: re["rect"]["x"] * factorX,
-        top: re["rect"]["y"] * factorY,
-        width: re["rect"]["w"] * factorX,
-        height: re["rect"]["h"] * factorY,
+        left: (rec.left * factorX*-1)+100,
+        top: (rec.top * factorY*-1)+100,
+        width: (rec.width * factorX)+100,
+        height: (rec.height * factorY)+100,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -341,10 +346,10 @@ class _TfliteTestState extends State<TfliteTest> {
             ),
           ),
           child: Text(
-            "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}%",
+            "${re.label} ${(re.score * 100).toStringAsFixed(0)}%",
             style: TextStyle(
               background: Paint()..color = blue,
-              color: Colors.white,
+              color: Colors.red,
               fontSize: 12.0,
             ),
           ),
