@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import './pillinformation.dart';
 import 'package:share_plus/share_plus.dart';
 import 'home.dart';
 import 'iapotheca_theme.dart';
@@ -45,7 +46,7 @@ class HomeScreen extends StatelessWidget {
     return MaterialApp(
       theme: theme,
       title: 'CountrAI',
-      home: const Home(), // home.dart
+      home: const Home(), // home.dart KYLE (added pill in params)
     );
   }
 }
@@ -77,8 +78,8 @@ class SessionReportScreen extends StatelessWidget {
                   },
                   child: Row(
                     children: [
-                     const Icon(Icons.add),
-                     const Text(' New Count'),
+                      const Icon(Icons.add),
+                      const Text(' New Count'),
                     ],
                   )),
               ElevatedButton(
