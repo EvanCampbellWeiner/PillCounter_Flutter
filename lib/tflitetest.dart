@@ -64,8 +64,8 @@ class _TfliteTestState extends State<TfliteTest> {
     try {
       image = await _picker.pickImage(
           source: ImageSource.gallery,
-          maxWidth: 600,
-          maxHeight: 600,
+          maxHeight: 5000,
+          maxWidth: 5000,
           imageQuality: 75);
       if (image == null) return;
       setState(() {
@@ -85,7 +85,6 @@ class _TfliteTestState extends State<TfliteTest> {
 
   Future predictImage(File image) async {
     if (image == null) return;
-    dev.log("here");
     switch (_model) {
       case yolo:
         print("yolo");
@@ -94,16 +93,10 @@ class _TfliteTestState extends State<TfliteTest> {
       case ssd:
         await ssdMobileNet(image);
         break;
-      case deeplab:
-        await segmentMobileNet(image);
-        break;
-      case posenet:
-        await poseNet(image);
-        break;
       default:
         print("default");
         await recognizeImage(image);
-      // await recognizeImageBinary(image);
+    // await recognizeImageBinary(image);
     }
 
     new FileImage(image)
@@ -166,8 +159,8 @@ class _TfliteTestState extends State<TfliteTest> {
     }
   }
 
-  Uint8List imageToByteListFloat32(
-      img.Image image, int inputSize, double mean, double std) {
+  Uint8List imageToByteListFloat32(img.Image image, int inputSize, double mean,
+      double std) {
     var convertedBytes = Float32List(1 * inputSize * inputSize * 3);
     var buffer = Float32List.view(convertedBytes.buffer);
     int pixelIndex = 0;
@@ -231,28 +224,64 @@ class _TfliteTestState extends State<TfliteTest> {
   }
 
   Future yolov2Tiny(File image) async {
+    int startTime = new DateTime.now().millisecondsSinceEpoch;
+    // var recognitions = await Tflite.detectObjectOnImage(
+    //     path: image.path,
+    //     numResultsPerClass: 1,);
+    var imageb = (await image.readAsBytes());
     // var imageBytes = (await rootBundle.load(image.path)).buffer;
-    // img.Image? oriImage = img.decodeJpg(imageBytes.asUint8List());
-    // img.Image resizedImage = img.copyResize(oriImage!, height: 640, width: 640);
-    Classifier classifier = await Classifier();
-    Interpreter interpreter = await Interpreter.fromAsset(
-      "model.tflite",
-      options: InterpreterOptions()..threads = 4,
-    );
-    var results = await classifier.predict(img.readJpg(image.readAsBytesSync())!);
-    // resizedImage = img.drawRect(resizedImage,results!.first.location.left,results!.first.location.top, results!.first.location.right, results!.first.location.bottom, 0  );
-    // var results = classifier.predict(resizedImage);
-    _recognitions = results!;
-    interpreter.close();
-    if(classifier.interpreter !=null) {
-      classifier.interpreter!.close();
-    }
-    dev.log("end");
+    img.Image? oriImage = img.decodeJpg(imageb);
+    // img.Image? image2 = img.decodeJpg(imageb);
+    img.Image? resizedImage = img.copyResize(oriImage!, height:640, width:640);
+    dev.log("resized image:" + resizedImage.width.toString());
+    // resizedImage.getBytes().shape.reshape([1,640,640,3]);
+    // dev.log("resized image:"+resizedImage.getBytes().shape.toString());
 
-    setState(() {
-      _recognitions = results;
-    });
+    Classifier classifier =  await Classifier();
+
+    await classifier.loadModel();
+    // if (classifier.interpreter != null && classifier.labels != null) {
+      dev.log("Running predict...");
+
+      var results = await classifier.predict(
+          resizedImage);
+      // resizedImage = img.drawRect(resizedImage,results!.first.location.left,results!.first.location.top, results!.first.location.right, results!.first.location.bottom, 0  );
+      // results = classifier.predict(resizedImage) as List?;
+      _recognitions = results!;
+      if (classifier.interpreter != null) {
+        classifier.interpreter!.close();
+      }
+      dev.log("end");
+      // String? res = await Tflite.loadModel(
+      //     model: "assets/model.tflite",
+      //     labels: "assets/model.txt",
+      //     numThreads: 1,
+      //     // defaults to 1
+      //     isAsset: true,
+      //     // defaults to true, set to false to load resources outside assets
+      //     useGpuDelegate: false // defaults to false, set to true to use GPU delegate
+      // );
+      // _recognitions = (await Tflite.detectObjectOnBinary(
+      //     binary: imageToByteListFloat32(res, 416, 0.0, 255.0),
+      //     // required
+      //     model: "YOLO",
+      //     threshold: 0.3,
+      //     // defaults to 0.1
+      //     numResultsPerClass: 2,
+      //     // defaults to 5   // defaults to [0.57273,0.677385,1.87446,2.06253,3.33843,5.47434,7.88282,3.52778,9.77052,9.16828]
+      //     blockSize: 32,
+      //     // defaults to 32
+      //     numBoxesPerBlock: 5,
+      //     // defaults to 5 s
+      //     asynch: true // defaults to true
+      // ))!;
+      // await Tflite.close();
+      // renderBoxes(Size(10,10));
+    // }
+
+    dev.log("oops");
   }
+
 
   Future ssdMobileNet(File image) async {
     int startTime = new DateTime.now().millisecondsSinceEpoch;
@@ -333,10 +362,10 @@ class _TfliteTestState extends State<TfliteTest> {
     return _recognitions.map((re) {
       Rect rec = re.renderLocation;
       return Positioned(
-        left: (rec.left * factorX*-1)+100,
-        top: (rec.top * factorY*-1)+100,
-        width: (rec.width * factorX)+100,
-        height: (rec.height * factorY)+100,
+        left: (rec.left * factorX * -1) + 100,
+        top: (rec.top * factorY * -1) + 100,
+        width: (rec.width * factorX) + 100,
+        height: (rec.height * factorY) + 100,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -348,7 +377,8 @@ class _TfliteTestState extends State<TfliteTest> {
           child: Text(
             "${re.label} ${(re.score * 100).toStringAsFixed(0)}%",
             style: TextStyle(
-              background: Paint()..color = blue,
+              background: Paint()
+                ..color = blue,
               color: Colors.red,
               fontSize: 12.0,
             ),
@@ -367,6 +397,9 @@ class _TfliteTestState extends State<TfliteTest> {
 
     var lists = <Widget>[];
     _recognitions.forEach((re) {
+      if (re.score > 0.5) {
+
+      }
       var color = Color((Random().nextDouble() * 0xFFFFFF).toInt() << 0)
           .withOpacity(1.0);
       var list = re["keypoints"].values.map<Widget>((k) {
@@ -393,14 +426,17 @@ class _TfliteTestState extends State<TfliteTest> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    Size size = MediaQuery
+        .of(context)
+        .size;
     List<Widget> stackChildren = [];
 
     stackChildren.add(Positioned(
       top: 0.0,
       left: 0.0,
       width: size.width,
-      child: _image == null ? Text('No image selected.') : Image.file(_image!),
+      child: _image == null ? Text('No image selected.') : Image.file(
+          _image!),
     ));
 
     if (_model == mobile) {
@@ -408,15 +444,17 @@ class _TfliteTestState extends State<TfliteTest> {
         child: Column(
           children: _recognitions != null
               ? _recognitions.map((res) {
-                  return Text(
-                    "${res["index"]} - ${res["label"]}: ${res["confidence"].toStringAsFixed(3)}",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20.0,
-                      background: Paint()..color = Colors.white,
-                    ),
-                  );
-                }).toList()
+            return Text(
+              "${res["index"]} - ${res["label"]}: ${res["confidence"]
+                  .toStringAsFixed(3)}",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20.0,
+                background: Paint()
+                  ..color = Colors.white,
+              ),
+            );
+          }).toList()
               : [],
         ),
       ));
