@@ -357,15 +357,13 @@ class _TfliteTestState extends State<TfliteTest> {
     double factorX = screen.width;
     double factorY = _imageHeight / _imageWidth * screen.width;
     Color blue = Color.fromRGBO(37, 213, 253, 1.0);
-    dev.log("Render Boxes");
-    dev.log(_recognitions.toString());
     return _recognitions.map((re) {
       Rect rec = re.renderLocation;
       return Positioned(
-        left: (rec.left * factorX * -1) + 100,
-        top: (rec.top * factorY * -1) + 100,
-        width: (rec.width * factorX) + 100,
-        height: (rec.height * factorY) + 100,
+        left: (rec.left * factorX),
+        top: (rec.top * factorY),
+        width: rec.width,
+        height: rec.height * factorY,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -375,12 +373,12 @@ class _TfliteTestState extends State<TfliteTest> {
             ),
           ),
           child: Text(
-            "${re.label} ${(re.score * 100).toStringAsFixed(0)}%",
+            "${(re.score * 100).toStringAsFixed(0)}%",
             style: TextStyle(
               background: Paint()
                 ..color = blue,
               color: Colors.red,
-              fontSize: 12.0,
+              fontSize: 8.0,
             ),
           ),
         ),

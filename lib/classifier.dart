@@ -182,20 +182,21 @@ class Classifier {
     for (int i = 0; i < resultsCount; i++) {
       // Prediction score
       var score = outputScores.getDoubleValue(i);
-
-      // Label string
-      // var labelIndex = outputClasses.getIntValue(i) + labelOffset;
-      var label = _labels!.elementAt(0);
-      dev.log(recognitions.toString()+"HERE TODAY");
+      if(score > 0.2) {
+        //Label string
+        // var labelIndex = outputClasses.getIntValue(i) + labelOffset;
+        var label = _labels!.elementAt(0);
+        dev.log(recognitions.toString()+"HERE TODAY");
         // inverse of rect
         // [locations] corresponds to the image size 300 X 300
         // inverseTransformRect transforms it our [inputImage]
         Rect transformedRect = imageProcessor.inverseTransformRect(
-            locations[i], image.height, image.width);
+        locations[i], image.height, image.width);
         // dev.log(recognitions.toString()+"HERE TODAY");
         recognitions.add(
-          Recognition(i, "pill", score, transformedRect),
+        Recognition(i, "pill", score, transformedRect),
         );
+      }
     }
 
     var predictElapsedTime =
