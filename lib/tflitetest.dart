@@ -39,8 +39,8 @@ class _TfliteTestState extends State<TfliteTest> {
   File? _image;
   List _recognitions = [];
   String _model = yolo;
-  double _imageHeight = 0;
-  double _imageWidth = 0;
+  double _imageHeight = 384;
+  double _imageWidth = 384;
   bool _busy = false;
 
   @override
@@ -351,16 +351,18 @@ class _TfliteTestState extends State<TfliteTest> {
     if (_recognitions == null) return [];
     if (_imageHeight == null || _imageWidth == null) return [];
 
-    double factorX = screen.width;
-    double factorY = _imageHeight / _imageWidth * screen.width;
+    double factorX = _imageWidth/screen.width * screen.width;
+    double factorY = _imageWidth/screen.width * screen.width;
     Color blue = Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions.map((re) {
       Rect rec = re.renderLocation;
+      dev.log(rec.toString());
       return Positioned(
-        left: (rec.left * factorX),
-        top: (rec.top * factorY),
+        left: (rec.left),
+        top: (rec.top),
+        height: rec.height,
         width: rec.width,
-        height: rec.height * factorY,
+
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -392,9 +394,6 @@ class _TfliteTestState extends State<TfliteTest> {
 
     var lists = <Widget>[];
     _recognitions.forEach((re) {
-      if (re.score > 0.5) {
-
-      }
       var color = Color((Random().nextDouble() * 0xFFFFFF).toInt() << 0)
           .withOpacity(1.0);
       var list = re["keypoints"].values.map<Widget>((k) {

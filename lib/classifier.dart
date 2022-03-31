@@ -178,10 +178,10 @@ class Classifier {
     // Using bounding box utils for easy conversion of tensorbuffer to List<Rect>
     List<Rect> locations = BoundingBoxUtils.convert(
       tensor: outputLocations,
-      valueIndex: [0,2,1,3],
+      valueIndex: [1,0, 3,2],
       boundingBoxAxis: 2,
-      boundingBoxType: BoundingBoxType.CENTER,
-      coordinateType: CoordinateType.PIXEL,
+      boundingBoxType: BoundingBoxType.BOUNDARIES,
+      coordinateType: CoordinateType.RATIO,
       height: image.height,
       width: image.width,
     );
