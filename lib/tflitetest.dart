@@ -428,7 +428,8 @@ class _TfliteTestState extends State<TfliteTest> {
     stackChildren.add(Positioned(
       top: 0.0,
       left: 0.0,
-      width: size.width,
+      width: 384,
+      height: 384,
       child: _image == null ? Text('No image selected.') : Image.file(
           _image!),
     ));
