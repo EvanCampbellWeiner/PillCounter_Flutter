@@ -87,9 +87,9 @@ class _TfliteTestState extends State<TfliteTest> {
     if (image == null) return;
     switch (_model) {
       case yolo:
-        print("yolo");
-        await yolov2Tiny(image);
-        break;
+      print("yolo");
+      await yolov2Tiny(image);
+      break;
       case ssd:
         await ssdMobileNet(image);
         break;
@@ -225,15 +225,12 @@ class _TfliteTestState extends State<TfliteTest> {
 
   Future yolov2Tiny(File image) async {
     int startTime = new DateTime.now().millisecondsSinceEpoch;
-    // var recognitions = await Tflite.detectObjectOnImage(
-    //     path: image.path,
-    //     numResultsPerClass: 1,);
     var imageb = (await image.readAsBytes());
     // var imageBytes = (await rootBundle.load(image.path)).buffer;
     img.Image? oriImage = img.decodeJpg(imageb);
     // img.Image? image2 = img.decodeJpg(imageb);
-    img.Image? resizedImage = img.copyResize(oriImage!, height:640, width:640);
-    dev.log("resized image:" + resizedImage.width.toString());
+    img.Image? resizedImage = img.copyResize(oriImage!, height:384, width:384);
+    // dev.log("resized image:" + resizedImage.width.toString());
     // resizedImage.getBytes().shape.reshape([1,640,640,3]);
     // dev.log("resized image:"+resizedImage.getBytes().shape.toString());
 

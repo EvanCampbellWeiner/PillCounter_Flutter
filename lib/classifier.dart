@@ -22,7 +22,7 @@ class Classifier {
   static const String LABEL_FILE_NAME = "model.txt";
 
   /// Input size of image (height = width = 300)
-  static const int INPUT_SIZE = 640;
+  static const int INPUT_SIZE = 384;
 
   /// Result score threshold
   static const double THRESHOLD = 0;
@@ -40,7 +40,7 @@ class Classifier {
  late  List<TfLiteType> _outputTypes;
 
   /// Number of results to show
-  static const int NUM_RESULTS = 30;
+  static const int NUM_RESULTS = 150;
 
   Classifier() {
     loadModel();
@@ -96,15 +96,17 @@ class Classifier {
 
   /// Runs object detection on the input image
   Future<List<dynamic>?> predict(imageLib.Image image) async {
+    // For Logging
     var predictStartTime = DateTime.now().millisecondsSinceEpoch;
-
     var preProcessStart = DateTime.now().millisecondsSinceEpoch;
-      // dev.log(_interpreter!.getInputTensors().toString());
+
     // Create TensorImage from image
    TensorImage  inputImage = TensorImage(TfLiteType.uint8);
    inputImage.loadImage(image);
     // Pre-process TensorImage
     inputImage = getProcessedImage(inputImage);
+
+    // Logging
     var preProcessElapsedTime =
         DateTime.now().millisecondsSinceEpoch - preProcessStart;
 
@@ -113,6 +115,8 @@ class Classifier {
     TensorBuffer outputClasses = TensorBufferFloat(_outputShapes[3]);
     TensorBuffer outputScores = TensorBufferFloat(_outputShapes[0]);
     TensorBuffer numLocations = TensorBufferFloat(_outputShapes[2]);
+
+
     // dev.log(inputImage.getDataType().toString());
     // // Inputs object for runForMultipleInputs
     // // Use [TensorImage.buffer] or [TensorBuffer.buffer] to pass by reference
@@ -134,6 +138,7 @@ class Classifier {
     dev.log("Input Tensors are: " + _interpreter!.getInputTensors().toString());
     dev.log("Input Shape is:" + inputs.shape.toString());
     dev.log("Input Type is:" + inputs.runtimeType.toString());
+
     // Outputs map
     Map<int, Object> outputs = {
       0: outputScores.buffer,
@@ -153,8 +158,12 @@ class Classifier {
     dev.log("Interpreter input tensors:"+_interpreter!.getInputTensors().toString());
     dev.log("Output Hash Map: "+ outputs.runtimeType.toString());
     dev.log("Output Shape: "+outputs[0]!.toString());
+
+
     // run inference
     _interpreter!.runForMultipleInputs([inputs], outputs);
+
+
     var inferenceTimeElapsed =
         DateTime.now().millisecondsSinceEpoch - inferenceTimeStart;
     // _interpreter.resize_tensor_input(0, [1, input_shape[0], input_shape[1], 3], strict=True)
@@ -178,11 +187,14 @@ class Classifier {
     );
 
     List<Recognition> recognitions = [];
-
+    var count = 0;
     for (int i = 0; i < resultsCount; i++) {
       // Prediction score
       var score = outputScores.getDoubleValue(i);
-      if(score > 0.2) {
+      dev.log(numLocations.buffer.asInt8List.toString());
+
+      if(score > 0.25) {
+        count++;
         //Label string
         // var labelIndex = outputClasses.getIntValue(i) + labelOffset;
         var label = _labels!.elementAt(0);
@@ -199,6 +211,7 @@ class Classifier {
       }
     }
 
+    dev.log("number of items: "+count.toString());
     var predictElapsedTime =
         DateTime.now().millisecondsSinceEpoch - predictStartTime;
 
