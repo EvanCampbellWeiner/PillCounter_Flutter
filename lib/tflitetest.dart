@@ -248,35 +248,6 @@ class _TfliteTestState extends State<TfliteTest> {
       if (classifier.interpreter != null) {
         classifier.interpreter!.close();
       }
-      dev.log("end");
-      // String? res = await Tflite.loadModel(
-      //     model: "assets/model.tflite",
-      //     labels: "assets/model.txt",
-      //     numThreads: 1,
-      //     // defaults to 1
-      //     isAsset: true,
-      //     // defaults to true, set to false to load resources outside assets
-      //     useGpuDelegate: false // defaults to false, set to true to use GPU delegate
-      // );
-      // _recognitions = (await Tflite.detectObjectOnBinary(
-      //     binary: imageToByteListFloat32(res, 416, 0.0, 255.0),
-      //     // required
-      //     model: "YOLO",
-      //     threshold: 0.3,
-      //     // defaults to 0.1
-      //     numResultsPerClass: 2,
-      //     // defaults to 5   // defaults to [0.57273,0.677385,1.87446,2.06253,3.33843,5.47434,7.88282,3.52778,9.77052,9.16828]
-      //     blockSize: 32,
-      //     // defaults to 32
-      //     numBoxesPerBlock: 5,
-      //     // defaults to 5 s
-      //     asynch: true // defaults to true
-      // ))!;
-      // await Tflite.close();
-      // renderBoxes(Size(10,10));
-    // }
-
-    dev.log("oops");
   }
 
 
@@ -353,10 +324,10 @@ class _TfliteTestState extends State<TfliteTest> {
 
     double factorX = _imageWidth/screen.width * screen.width;
     double factorY = _imageWidth/screen.width * screen.width;
+    var length = _recognitions.length;
     Color blue = Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions.map((re) {
       Rect rec = re.renderLocation;
-      dev.log(rec.toString());
       return Positioned(
         left: (rec.left),
         top: (rec.top),
@@ -372,12 +343,12 @@ class _TfliteTestState extends State<TfliteTest> {
             ),
           ),
           child: Text(
-            "${(re.score * 100).toStringAsFixed(0)}%",
+            "${(re.id).toStringAsFixed(0)}",
             style: TextStyle(
               background: Paint()
                 ..color = blue,
               color: Colors.red,
-              fontSize: 8.0,
+              fontSize: re.id == length-1 ? 12.0 : 10,
             ),
           ),
         ),
