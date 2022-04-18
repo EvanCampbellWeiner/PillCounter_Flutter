@@ -343,12 +343,12 @@ class _TfliteTestState extends State<TfliteTest> {
             ),
           ),
           child: Text(
-            "${(re.id).toStringAsFixed(0)}",
+            "${(re.id+1).toStringAsFixed(0)}",
             style: TextStyle(
               background: Paint()
                 ..color = blue,
               color: Colors.red,
-              fontSize: re.id == length-1 ? 12.0 : 10,
+              fontSize: re.id == length-1 ? 14.0 : 10,
             ),
           ),
         ),
