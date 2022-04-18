@@ -1,21 +1,9 @@
 import 'dart:async';
-//import 'dart:html';
-import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import './pillinformation.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:tflite/tflite.dart';
 import 'home.dart';
 import 'iapotheca_theme.dart';
-import 'report.dart';
-import 'tflitetest.dart';
-
-import 'tflite.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -31,7 +19,8 @@ Future<void> main() async {
   // // Obtain a list of the available cameras on the device.
   cameras = await availableCameras();
 
-  runApp(const TfliteScreen());
+  // runApp(const TfliteScreen());
+  runApp(const HomeScreen());
 }
 
 /**

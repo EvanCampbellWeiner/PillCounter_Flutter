@@ -10,6 +10,7 @@ import 'package:http/io_client.dart' as io;
 import 'main.dart';
 import 'camerawidgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'pillcounter.dart';
 
 /**
    Pill Information Class (Object)
@@ -183,7 +184,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          TakePictureScreen(camera: cameras.first)),
+                          const PillCounter()),
                 );
               },
               child: const Text('Okay'),
@@ -194,19 +195,6 @@ class _PillInformationReviewState extends State<PillInformationReview> {
       // TODO: Add bottom navigation bar
     );
   }
-}
-
-Future<CameraDescription> loadCamera() async {
-  // Ensure that plugin services are initialized so that `availableCameras()`
-  // can be called before `runApp()`
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // // Obtain a list of the available cameras on the device.
-  final cameras = await availableCameras();
-
-  // // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras.first;
-  return firstCamera;
 }
 
 /**

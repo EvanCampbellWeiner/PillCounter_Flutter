@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pillcounter_flutter/tflitetest.dart';
+import 'package:pillcounter_flutter/pillcounter.dart';
 import 'iapotheca_theme.dart';
 
 /**
@@ -17,7 +17,7 @@ class TfliteScreen extends StatelessWidget {
     return MaterialApp(
       theme: theme,
       title: 'CountrAI',
-      home: const TfliteTest(),
+      home: const PillCounter(),
     );
   }
 }

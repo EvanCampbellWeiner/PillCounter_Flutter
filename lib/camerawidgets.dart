@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'report.dart';
 import 'main.dart';
 import 'dart:io';
+import 'dart:developer' as dev;
+import 'package:image_picker/image_picker.dart';
 
 /**
    Take Picture Screen Class | 
@@ -65,6 +67,29 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       appBar: AppBar(
         title: const Text('Take a Picture'),
         centerTitle: true,
+          actions: <Widget>[
+            IconButton(
+            icon: const Icon(Icons.image),
+            tooltip: 'Select Image',
+            onPressed: () {
+                var _picker = ImagePicker();
+                var image = null;
+                try {
+                  image = _picker.pickImage(
+                      source: ImageSource.gallery,
+                      maxHeight: 5000,
+                      maxWidth: 5000,
+                      imageQuality: 75);
+                  if (image == null) return;
+                } catch (e) {
+                  setState(() {
+                    print(e);
+                  });
+                }
+                Navigator.pop(context, image);
+            },
+          ),
+        ]
       ),
       // You must wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner until the
@@ -93,17 +118,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             // Attempt to take a picture and get the file `image`
             // where it was saved.
             final image = await _cameraController.takePicture();
-
+            dev.log("Trying to pop");
             // If the picture was taken, display it on a new screen.
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  // Pass the automatically generated path to
-                  // the DisplayPictureScreen widget.
-                  imagePath: image.path,
-                ),
-              ),
-            );
+            Navigator.pop(context, image);
           } catch (e) {
             // If an error occurs, log the error to the console.
           }
