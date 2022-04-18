@@ -44,6 +44,8 @@ dependencies:
   opencv_4: ^1.0.0
   tflite:  ^1.0.0
   image: ^3.0.0
+  tflite_flutter: ^0.9.0
+  tflite_flutter_helper:
   shared_preferences: ^2.0.13
 
 dev_dependencies:
@@ -72,7 +74,11 @@ flutter:
   assets:
      - assets/ssd_mobilenet.tflite
      - assets/ssd_mobilenet.txt
-
+     - assets/yolov5s.tflite
+     - assets/yolov5s.txt
+     - assets/model.tflite
+     - assets/model.txt
+     - assets/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
