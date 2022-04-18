@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:developer' as dev;
@@ -6,6 +7,8 @@ import 'dart:developer' as dev;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pillcounter_flutter/pillinformation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
@@ -33,6 +36,7 @@ class _PillCounterState extends State<PillCounter> {
   double _imageHeight = 384;
   double _imageWidth = 384;
   bool _busy = false;
+  int _count = 0;
 
   @override
   void initState() {
@@ -162,6 +166,9 @@ class _PillCounterState extends State<PillCounter> {
     if (_recognitions == null) return [];
     if (_imageHeight == null || _imageWidth == null) return [];
 
+    // Update Count
+    _count = _recognitions.length;
+
     double factorX = _imageWidth/screen.width * screen.width;
     double factorY = _imageWidth/screen.width * screen.width;
     var length = _recognitions.length;
@@ -261,7 +268,21 @@ class _PillCounterState extends State<PillCounter> {
             IconButton(
               icon: const Icon(Icons.save),
               tooltip: 'Add To Report',
-              onPressed: () {
+              onPressed: () async {
+                final SharedPreferences prefs = await SharedPreferences.getInstance();
+                final String? pillReportString = prefs.getString('pillcounts');
+                final String? currentCount = prefs.getString('currentCount');
+                PillInformation pillInfo = PillInformation.fromJson(jsonDecode(currentCount!));
+                pillInfo.count = _count;
+                List<PillInformation> pillReport =
+                pillReportString != null ? PillInformation.decode(pillReportString) : List.filled(1,pillInfo, growable: true);
+                if(!pillReport.contains(pillInfo)) {
+                  if (pillReport.length >= 1) {
+                    pillReport.add(pillInfo);
+                  }
+                }
+                final String result = PillInformation.encode(pillReport);
+                prefs.setString('pillcounts', (result));
                 Navigator.push(context, MaterialPageRoute(builder:(context)=> SessionReport()));
               },
             ),

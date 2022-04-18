@@ -81,11 +81,7 @@ class _SessionReportState extends State<SessionReport> {
                     return ListTile(
                       title: Text(snapshot.data[index].description),
                       subtitle: Text(snapshot.data[index].din),
-                      // trailing: Row(
-                      //   children: <Widget>[
-                      //     Text(snapshot.data[index].count),
-                      //   ],
-                      // )
+                      trailing: Text(snapshot.data[index].count.toString())
                     );
                   },
                   separatorBuilder: (context, index) {

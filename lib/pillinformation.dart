@@ -167,19 +167,24 @@ class _PillInformationReviewState extends State<PillInformationReview> {
               onPressed: () async {
                 final SharedPreferences prefs =
                     await SharedPreferences.getInstance();
-                final String? pillReportString = prefs.getString('pillcounts');
-                List<PillInformation> pillReport =
-                   pillReportString != null ? PillInformation.decode(pillReportString) : List.filled(1,PillInformation(
-                       din: _dinTextInputController.text,
-                       description: _descTextInputController.text,
-                       count: 0) , growable: true);
-
-                pillReport.add(PillInformation(
-                    din: _dinTextInputController.text,
-                    description: _descTextInputController.text,
-                    count: 0));
-                final String result = PillInformation.encode(pillReport);
-                await prefs.setString('pillcounts', (result));
+                prefs.setString('currentCount', jsonEncode(PillInformation.toMap(PillInformation(
+                  din: _dinTextInputController.text,
+                  description: _descTextInputController.text,
+                  count: 0
+                ))));
+                // final String? pillReportString = prefs.getString('pillcounts');
+                // List<PillInformation> pillReport =
+                //    pillReportString != null ? PillInformation.decode(pillReportString) : List.filled(1,PillInformation(
+                //        din: _dinTextInputController.text,
+                //        description: _descTextInputController.text,
+                //        count: 0) , growable: true);
+                //
+                // pillReport.add(PillInformation(
+                //     din: _dinTextInputController.text,
+                //     description: _descTextInputController.text,
+                //     count: 0));
+                // final String result = PillInformation.encode(pillReport);
+                // await prefs.setString('pillcounts', (result));
                 Navigator.push(
                   context,
                   MaterialPageRoute(
