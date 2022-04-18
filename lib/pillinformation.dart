@@ -7,10 +7,12 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/io_client.dart' as io;
+import 'package:path/path.dart';
 import 'main.dart';
 import 'camerawidgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pillcounter.dart';
+import 'dart:developer' as dev;
 
 /**
    Pill Information Class (Object)
@@ -39,14 +41,13 @@ class PillInformation {
   }
 
   static Map<String, dynamic> toMap(PillInformation pill) => {
-        'drug_identification_number':pill.din,
-        'brand_name':pill.description,
+        'drug_identification_number': pill.din,
+        'brand_name': pill.description,
         'count': pill.count,
       };
 
   static String encode(List<PillInformation> Pills) => json.encode(
-        Pills
-            .map<Map<String, dynamic>>((pill) => PillInformation.toMap(pill))
+        Pills.map<Map<String, dynamic>>((pill) => PillInformation.toMap(pill))
             .toList(),
       );
 
@@ -105,15 +106,30 @@ class _PillInformationReviewState extends State<PillInformationReview> {
   void initState() {
     setState(() {});
     super.initState();
+    _dinTextInputController.addListener(() {
+      dev.log(_dinTextInputController.text);
+    });
+    _descTextInputController.addListener(() {
+      dev.log(_descTextInputController.text);
+    });
+    _cntTextInputController.addListener(() {
+      dev.log(_cntTextInputController.text);
+    });
+    new Future.delayed(Duration.zero, () {
+      final args = ModalRoute.of(context as BuildContext)!.settings.arguments
+          as ScreenArguments;
+      _dinTextInputController.text = args.pInfo.din;
+      _descTextInputController.text = args.pInfo.description;
+      _cntTextInputController.text = args.pInfo.count.toString();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final pillinfo =
-        ModalRoute.of(context)!.settings.arguments as PillInformation;
-    _dinTextInputController.text = pillinfo.din;
-    _descTextInputController.text = pillinfo.description;
-    _cntTextInputController.text = pillinfo.count.toString();
+    final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
+    // _dinTextInputController.text = args.pInfo.din;
+    // _descTextInputController.text = args.pInfo.description;
+    // _cntTextInputController.text = args.pInfo.count.toString();
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -137,7 +153,6 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 border: OutlineInputBorder(),
               ),
             ),
-            // KYLE (another text form field for the description)
             SizedBox(height: 25),
             TextFormField(
               controller: _descTextInputController,
@@ -165,32 +180,51 @@ class _PillInformationReviewState extends State<PillInformationReview> {
             SizedBox(height: 25),
             ElevatedButton(
               onPressed: () async {
-                final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                prefs.setString('currentCount', jsonEncode(PillInformation.toMap(PillInformation(
-                  din: _dinTextInputController.text,
-                  description: _descTextInputController.text,
-                  count: 0
-                ))));
-                // final String? pillReportString = prefs.getString('pillcounts');
-                // List<PillInformation> pillReport =
-                //    pillReportString != null ? PillInformation.decode(pillReportString) : List.filled(1,PillInformation(
-                //        din: _dinTextInputController.text,
-                //        description: _descTextInputController.text,
-                //        count: 0) , growable: true);
-                //
-                // pillReport.add(PillInformation(
-                //     din: _dinTextInputController.text,
-                //     description: _descTextInputController.text,
-                //     count: 0));
-                // final String result = PillInformation.encode(pillReport);
-                // await prefs.setString('pillcounts', (result));
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const PillCounter()),
-                );
+                if (args.ind == null) {
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.setString(
+                      'currentCount',
+                      jsonEncode(PillInformation.toMap(PillInformation(
+                          din: _dinTextInputController.text,
+                          description: _descTextInputController.text,
+                          count: 0))));
+                  // final String? pillReportString = prefs.getString('pillcounts');
+                  // List<PillInformation> pillReport =
+                  //    pillReportString != null ? PillInformation.decode(pillReportString) : List.filled(1,PillInformation(
+                  //        din: _dinTextInputController.text,
+                  //        description: _descTextInputController.text,
+                  //        count: 0) , growable: true);
+                  //
+                  // pillReport.add(PillInformation(
+                  //     din: _dinTextInputController.text,
+                  //     description: _descTextInputController.text,
+                  //     count: 0));
+                  // final String result = PillInformation.encode(pillReport);
+                  // await prefs.setString('pillcounts', (result));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PillCounter()),
+                  );
+                } else {
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  final String? pillReportString =
+                      prefs.getString('pillcounts');
+                  final List<dynamic> pillReport =
+                      PillInformation.decode(pillReportString ?? "");
+                  int i = args.ind ?? -1; // This will never be null
+                  PillInformation updated = PillInformation(
+                      din: _dinTextInputController.text,
+                      description: _descTextInputController.text,
+                      count: int.parse(_cntTextInputController.text ?? '0'));
+                  pillReport[i] = updated;
+                  final String result = PillInformation.encode(
+                      pillReport as List<PillInformation>);
+                  prefs.setString('pillcounts', (result));
+                  Navigator.pop(context);
+                }
               },
               child: const Text('Okay'),
             ),
@@ -239,41 +273,42 @@ class DINInputFormState extends State<DINInputForm> {
           ),
         ),
         ElevatedButton(
-          onPressed: () async {
-            // Validate returns true if the form is valid, or false otherwise.
-            if (_formKey.currentState!.validate()) {
-              // If the form is valid, display a snackbar. In the real world,
-              // you'd often call a server or save the information in a database.
-              try {
-                PillInformation pillinfo =
-                    PillInformation(din: "", description: "");
-                await fetchPillInformation(dinController.text, io.IOClient())
-                    .then((PillInformation result) {
-                  setState(() {
-                    pillinfo = result;
+            onPressed: () async {
+              //Validate returns true if the form is valid, or false otherwise.
+              if (_formKey.currentState!.validate()) {
+                // If the form is valid, display a snackbar. In the real world,
+                // you'd often call a server or save the information in a database.
+                try {
+                  PillInformation pillinfo =
+                      PillInformation(din: "", description: "");
+                  await fetchPillInformation(dinController.text, io.IOClient())
+                      .then((PillInformation result) {
+                    setState(() {
+                      pillinfo = result;
+                    });
                   });
-                });
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => PillInformationReview(),
-                      settings: RouteSettings(arguments: pillinfo)),
-                );
-                // }
-              } catch (Exception) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => PillInformationReview(),
-                      settings: RouteSettings(
-                          arguments: PillInformation(
-                              din: "00000000", description: "Error"))),
-                );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PillInformationReview(),
+                        settings: RouteSettings(
+                            arguments: ScreenArguments(pillinfo, null))),
+                  );
+                  // }
+                } catch (Exception) {
+                  PillInformation err =
+                      PillInformation(din: "00000000", description: "Error");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PillInformationReview(),
+                        settings: RouteSettings(
+                            arguments: ScreenArguments(err, null))),
+                  );
+                }
               }
-            }
-          },
-          child: const Text('Submit'),
-        ),
+            },
+            child: const Text('Submit'))
       ]),
     );
   }
@@ -292,4 +327,11 @@ class DINInputForm extends StatefulWidget {
   DINInputFormState createState() {
     return DINInputFormState();
   }
+}
+
+class ScreenArguments {
+  final PillInformation pInfo;
+  final int? ind;
+
+  ScreenArguments(this.pInfo, this.ind);
 }
