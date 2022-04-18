@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pillcounter_flutter/pillinformation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'classifier.dart';
@@ -43,12 +42,6 @@ class _PillCounterState extends State<PillCounter> {
     super.initState();
 
     _busy = true;
-
-    loadModel().then((val) {
-      setState(() {
-        _busy = false;
-      });
-    });
   }
 
   Future<CameraDescription> loadCamera() async {
@@ -94,31 +87,6 @@ class _PillCounterState extends State<PillCounter> {
   }
 
 
-  Future loadModel() async {
-    Tflite.close();
-    try {
-      String? res;
-      switch (_model) {
-        case model:
-          res = await Tflite.loadModel(
-            model: "assets/model.tflite",
-            labels: "assets/model.txt",
-            // useGpuDelegate: true,
-          );
-          break;
-        default:
-          res = await Tflite.loadModel(
-            model: "assets/model.tflite",
-            labels: "assets/model.txt",
-            // useGpuDelegate: true,
-          );
-      }
-    } on PlatformException {
-      print('Failed to load model.');
-    }
-  }
-
-
   Future runModel(File image) async {
     int startTime = new DateTime.now().millisecondsSinceEpoch;
     var imageb = (await image.readAsBytes());
@@ -152,7 +120,6 @@ class _PillCounterState extends State<PillCounter> {
       _model = model;
       _recognitions = [];
     });
-    await loadModel();
 
     if (_image != null)
       predictImage(_image!);
