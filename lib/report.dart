@@ -15,37 +15,6 @@ Future<List<dynamic>> createPillInformationList() async {
   return pillReport;
 }
 
-// Generate a list of pill Informations asynchronously.
-// Add 12 pill Informations to pillInformationList, waiting for a response
-// before adding them each time.
-//
-// Future<List<PillInformation>> createPillInformationList() async {
-//   List<PillInformation> pillInformationList = [];
-//   final pillDins = [
-//     "00000019",
-//     "00000175",
-//     "00000213",
-//     "00000396",
-//     "00000485",
-//     "00000604",
-//     "00000655",
-//     "00001120",
-//     "00001147",
-//     "00001686",
-//     "00001341",
-//   ];
-//
-// // Holds title of pillInformation List
-//   pillInformationList.add(PillInformation(description: "Name", din: "DIN"));
-//
-//   for (int i = 0; i < pillDins.length; i++) {
-//     pillInformationList
-//         .add(await fetchPillInformation(pillDins[i], io.IOClient()));
-//   }
-//
-//   return pillInformationList;
-// }
-
 class SessionReport extends StatefulWidget {
   SessionReport({Key? key}) : super(key: key);
 
@@ -54,6 +23,17 @@ class SessionReport extends StatefulWidget {
 }
 
 class _SessionReportState extends State<SessionReport> {
+  void initState() {
+    setState(() {
+      () async {
+        Future<List<dynamic>> pillL = createPillInformationList();
+        List<dynamic> pills = await pillL;
+        return pills;
+      };
+    });
+    super.initState();
+  }
+
   static const int numItems = 10;
   @override
   Widget build(BuildContext context) {
@@ -67,7 +47,7 @@ class _SessionReportState extends State<SessionReport> {
       ),
       body: Center(
           child: (FutureBuilder<List<dynamic>>(
-        future: createPillInformationList(),
+        future: pills,
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
@@ -86,27 +66,49 @@ class _SessionReportState extends State<SessionReport> {
                   //   ],)
                   // );
                   // }
-                  return ListTile(
-                    title: Text(snapshot.data[index].description),
-                    subtitle: Text(snapshot.data[index].din),
-                    trailing: Text(snapshot.data[index].count.toString()),
-                    onTap: () {
-                      PillInformation tapped = PillInformation(
-                        din: snapshot.data[index].din,
-                        description: snapshot.data[index].description,
-                        count: snapshot.data[index].count,
-                      );
-                      ScreenArguments toPass = ScreenArguments(tapped, index);
-                      //final SharedPreferences prefs = await SharedPreferences.getInstance();
-                      //prefs.setString('index',index.toString());
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PillInformationReview(),
-                            settings:
-                                RouteSettings(arguments: toPass)),
-                      );
+                  final item = snapshot.data[index];
+                  return Dismissible(
+                    key: Key(item.toString()),
+                    onDismissed: (direction) {
+                      setState(() {
+                        snapshot.data.removeAt(index);
+                      });
+                      () async {
+                        //snapshot.data.removeAt(index);
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        // final String? pillReportString =
+                        //     prefs.getString('pillcounts');
+                        // final List<dynamic> pillReport =
+                        //     PillInformation.decode(pillReportString ?? "");
+
+                        prefs.setString(
+                            'pillcounts',
+                            PillInformation.encode(
+                                snapshot.data as List<PillInformation>));
+                      };
                     },
+                    child: ListTile(
+                      title: Text(item.description),
+                      subtitle: Text(item.din),
+                      trailing: Text(item.count.toString()),
+                      onTap: () {
+                        PillInformation tapped = PillInformation(
+                          din: item.din,
+                          description: item.description,
+                          count: item.count,
+                        );
+                        ScreenArguments toPass = ScreenArguments(tapped, index);
+                        //final SharedPreferences prefs = await SharedPreferences.getInstance();
+                        //prefs.setString('index',index.toString());
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PillInformationReview(),
+                              settings: RouteSettings(arguments: toPass)),
+                        );
+                      },
+                    ),
                   );
                 },
                 separatorBuilder: (context, index) {

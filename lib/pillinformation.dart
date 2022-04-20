@@ -106,22 +106,15 @@ class _PillInformationReviewState extends State<PillInformationReview> {
   void initState() {
     setState(() {});
     super.initState();
-    _dinTextInputController.addListener(() {
-      dev.log(_dinTextInputController.text);
-    });
-    _descTextInputController.addListener(() {
-      dev.log(_descTextInputController.text);
-    });
-    _cntTextInputController.addListener(() {
-      dev.log(_cntTextInputController.text);
-    });
-    new Future.delayed(Duration.zero, () {
-      final args = ModalRoute.of(context as BuildContext)!.settings.arguments
-          as ScreenArguments;
-      _dinTextInputController.text = args.pInfo.din;
-      _descTextInputController.text = args.pInfo.description;
-      _cntTextInputController.text = args.pInfo.count.toString();
-    });
+    // _dinTextInputController.addListener(() {
+    //   dev.log(_dinTextInputController.text);
+    // });
+    // _descTextInputController.addListener(() {
+    //   dev.log(_descTextInputController.text);
+    // });
+    // _cntTextInputController.addListener(() {
+    //   dev.log(_cntTextInputController.text);
+    // });
   }
 
   @override
@@ -130,6 +123,16 @@ class _PillInformationReviewState extends State<PillInformationReview> {
     // _dinTextInputController.text = args.pInfo.din;
     // _descTextInputController.text = args.pInfo.description;
     // _cntTextInputController.text = args.pInfo.count.toString();
+    _dinTextInputController.text = (_dinTextInputController.text == '')
+        ? args.pInfo.din
+        : _dinTextInputController.text;
+    _descTextInputController.text = (_descTextInputController.text == '')
+        ? args.pInfo.description
+        : _descTextInputController.text;
+    _cntTextInputController.text = (_cntTextInputController.text == '')
+        ? args.pInfo.count.toString()
+        : _cntTextInputController.text;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -218,7 +221,7 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                   PillInformation updated = PillInformation(
                       din: _dinTextInputController.text,
                       description: _descTextInputController.text,
-                      count: int.parse(_cntTextInputController.text ?? '0'));
+                      count: int.parse(_cntTextInputController.text));
                   pillReport[i] = updated;
                   final String result = PillInformation.encode(
                       pillReport as List<PillInformation>);
