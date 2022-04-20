@@ -250,7 +250,7 @@ class _PillCounterState extends State<PillCounter> {
                 }
                 final String result = PillInformation.encode(pillReport);
                 prefs.setString('pillcounts', (result));
-                Navigator.push(context, MaterialPageRoute(builder:(context)=> SessionReport()));
+                Navigator.push(context, MaterialPageRoute(builder:(context)=> SessionReport(pillInfo:pillReport)));
               },
             ),
           ]

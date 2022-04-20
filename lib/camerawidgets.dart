@@ -159,10 +159,10 @@ class _DisplayPictureScreen extends State<DisplayPictureScreen> {
   void _onItemTapped(int index) {
     setState(() {
       if (index == 1) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SessionReport()),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => SessionReport()),
+        // );
       }
       _selectedIndex = index;
     });
