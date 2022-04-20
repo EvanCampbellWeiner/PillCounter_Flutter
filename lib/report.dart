@@ -8,9 +8,13 @@ import 'pillinformation.dart';
 import 'package:http/io_client.dart' as io;
 import 'dart:developer' as dev;
 
+///
+/// UpdatePillInformationList
+///
+///
 updatePillInformationList(List<PillInformation> list) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
- prefs.setString('pillcounts', PillInformation.encode(list));
+  prefs.setString('pillcounts', PillInformation.encode(list));
 }
 
 class SessionReport extends StatefulWidget {
@@ -39,12 +43,11 @@ class _SessionReportState extends State<SessionReport> {
                 itemBuilder: (BuildContext context, int index) {
                   final item = widget.pillInfo[index];
                   return Dismissible(
-                    key: Key((item.din.toString()+ widget.rand.nextInt(10000).toString())),
+                    key: Key((item.din.toString() + widget.rand.nextInt(10000).toString())),
                     onDismissed: (direction) {
                       setState(() {
                         if(widget.pillInfo.length > 1) {
                           widget.pillInfo.removeAt(index);
-                          dev.log("hi");
                         }
                       });
                       updatePillInformationList(widget.pillInfo);

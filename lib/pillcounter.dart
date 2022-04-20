@@ -230,7 +230,7 @@ class _PillCounterState extends State<PillCounter> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pill Count'),
+        title: Text((_recognitions.length.toString() ?? "0")+" Pills Counted"),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.save),
