@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pillinformation.dart';
 import 'iapotheca_theme.dart';
+import 'report.dart';
 
 /**
  * Home Class | 
@@ -19,7 +20,6 @@ class Home extends StatefulWidget {
  * HomeScreen widget in main.dart
  */
 class _HomeState extends State<Home> {
-
   @override
   void initState() {
     super.initState();
@@ -28,10 +28,20 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final theme = iApothecaTheme.light();
-    return MaterialApp(home: Scaffold(
+    return MaterialApp(
+        home: Scaffold(
       appBar: AppBar(
         title: const Text('Pill Counter'),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+              icon: const Icon(Icons.list_alt),
+              tooltip: 'Go To Report',
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SessionReport()));
+              })
+        ],
       ),
       body: Center(
         child: Column(

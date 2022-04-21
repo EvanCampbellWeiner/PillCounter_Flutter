@@ -57,14 +57,13 @@ class _PillCounterState extends State<PillCounter> {
     return firstCamera;
   }
 
-
   Future predictImage(File image) async {
     if (image == null) return;
     // Add Other Models to Switch
     switch (_model) {
       case model:
         await runModel(image);
-      break;
+        break;
       default:
         throw Exception("Model Not Selected.");
     }
@@ -86,32 +85,31 @@ class _PillCounterState extends State<PillCounter> {
     });
   }
 
-
   Future runModel(File image) async {
     int startTime = new DateTime.now().millisecondsSinceEpoch;
     var imageb = (await image.readAsBytes());
     // var imageBytes = (await rootBundle.load(image.path)).buffer;
     img.Image? oriImage = img.decodeJpg(imageb);
     // img.Image? image2 = img.decodeJpg(imageb);
-    img.Image? resizedImage = img.copyResize(oriImage!, height:384, width:384);
+    img.Image? resizedImage =
+        img.copyResize(oriImage!, height: 384, width: 384);
     // dev.log("resized image:" + resizedImage.width.toString());
     // resizedImage.getBytes().shape.reshape([1,640,640,3]);
     // dev.log("resized image:"+resizedImage.getBytes().shape.toString());
 
-    Classifier classifier =  await Classifier();
+    Classifier classifier = await Classifier();
 
     await classifier.loadModel();
     // if (classifier.interpreter != null && classifier.labels != null) {
-      dev.log("Running predict...");
+    dev.log("Running predict...");
 
-      var results = await classifier.predict(
-          resizedImage);
-      // resizedImage = img.drawRect(resizedImage,results!.first.location.left,results!.first.location.top, results!.first.location.right, results!.first.location.bottom, 0  );
-      // results = classifier.predict(resizedImage) as List?;
-      _recognitions = results!;
-      if (classifier.interpreter != null) {
-        classifier.interpreter!.close();
-      }
+    var results = await classifier.predict(resizedImage);
+    // resizedImage = img.drawRect(resizedImage,results!.first.location.left,results!.first.location.top, results!.first.location.right, results!.first.location.bottom, 0  );
+    // results = classifier.predict(resizedImage) as List?;
+    _recognitions = results!;
+    if (classifier.interpreter != null) {
+      classifier.interpreter!.close();
+    }
   }
 
   onSelect(model) async {
@@ -136,8 +134,8 @@ class _PillCounterState extends State<PillCounter> {
     // Update Count
     _count = _recognitions.length;
 
-    double factorX = _imageWidth/screen.width * screen.width;
-    double factorY = _imageWidth/screen.width * screen.width;
+    double factorX = _imageWidth / screen.width * screen.width;
+    double factorY = _imageWidth / screen.width * screen.width;
     var length = _recognitions.length;
     Color blue = Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions.map((re) {
@@ -147,7 +145,6 @@ class _PillCounterState extends State<PillCounter> {
         top: (rec.top),
         height: rec.height,
         width: rec.width,
-
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -157,12 +154,11 @@ class _PillCounterState extends State<PillCounter> {
             ),
           ),
           child: Text(
-            "${(re.id+1).toStringAsFixed(0)}",
+            "${(re.id + 1).toStringAsFixed(0)}",
             style: TextStyle(
-              background: Paint()
-                ..color = blue,
+              background: Paint()..color = blue,
               color: Colors.red,
-              fontSize: re.id == length-1 ? 14.0 : 10,
+              fontSize: re.id == length - 1 ? 14.0 : 10,
             ),
           ),
         ),
@@ -205,9 +201,7 @@ class _PillCounterState extends State<PillCounter> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery
-        .of(context)
-        .size;
+    Size size = MediaQuery.of(context).size;
     List<Widget> stackChildren = [];
 
     stackChildren.add(Positioned(
@@ -215,8 +209,7 @@ class _PillCounterState extends State<PillCounter> {
       left: 0.0,
       width: 384,
       height: 384,
-      child: _image == null ? Text('No image selected.') : Image.file(
-          _image!),
+      child: _image == null ? Text('No image selected.') : Image.file(_image!),
     ));
     stackChildren.addAll(renderBoxes(size));
 
@@ -230,31 +223,35 @@ class _PillCounterState extends State<PillCounter> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text((_recognitions.length.toString() ?? "0")+" Pills Counted"),
+          title:
+              Text((_recognitions.length.toString() ?? "0") + " Pills Counted"),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.save),
               tooltip: 'Add To Report',
               onPressed: () async {
-                final SharedPreferences prefs = await SharedPreferences.getInstance();
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
                 final String? pillReportString = prefs.getString('pillcounts');
                 final String? currentCount = prefs.getString('currentCount');
-                PillInformation pillInfo = PillInformation.fromJson(jsonDecode(currentCount!));
+                PillInformation pillInfo =
+                    PillInformation.fromJson(jsonDecode(currentCount!));
                 pillInfo.count = _count;
-                List<PillInformation> pillReport =
-                pillReportString != null ? PillInformation.decode(pillReportString) : List.filled(1,pillInfo, growable: true);
-                if(!pillReport.contains(pillInfo)) {
+                List<PillInformation> pillReport = pillReportString != null
+                    ? PillInformation.decode(pillReportString)
+                    : List.filled(1, pillInfo, growable: true);
+                if (!pillReport.contains(pillInfo)) {
                   if (pillReport.length >= 1) {
                     pillReport.add(pillInfo);
                   }
                 }
                 final String result = PillInformation.encode(pillReport);
                 prefs.setString('pillcounts', (result));
-                Navigator.push(context, MaterialPageRoute(builder:(context)=> SessionReport(pillInfo:pillReport)));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SessionReport()));
               },
             ),
-          ]
-      ),
+          ]),
       body: Stack(
         children: stackChildren,
       ),
@@ -264,8 +261,8 @@ class _PillCounterState extends State<PillCounter> {
           var image = await Navigator.push(
               context,
               MaterialPageRoute<dynamic>(
-                  builder: (context)=> TakePictureScreen(camera:camera)));
-          if(image != null) {
+                  builder: (context) => TakePictureScreen(camera: camera)));
+          if (image != null) {
             dev.log("made it back");
             predictImage(File(image.path));
           }

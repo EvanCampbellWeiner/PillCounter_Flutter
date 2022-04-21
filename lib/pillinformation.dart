@@ -13,6 +13,7 @@ import 'camerawidgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pillcounter.dart';
 import 'dart:developer' as dev;
+import 'report.dart';
 
 /**
    Pill Information Class (Object)
@@ -140,6 +141,15 @@ class _PillInformationReviewState extends State<PillInformationReview> {
           // 2
         ),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+              icon: const Icon(Icons.list_alt),
+              tooltip: 'Go To Report',
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SessionReport()));
+              })
+        ],
       ),
       body: Center(
         child: Column(
