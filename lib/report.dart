@@ -62,6 +62,9 @@ class _SessionReportState extends State<SessionReport> {
                 onPressed: () {
                   List<PillInformation> empty = [];
                   updatePillInformationList(empty);
+                  setState(() {});
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Session Report Deleted")));
                 },
               ),
               IconButton(
