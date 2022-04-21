@@ -51,168 +51,173 @@ class _SessionReportState extends State<SessionReport> {
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-            leading: (IconButton(
-              icon: const Icon(Icons.delete),
-              tooltip: 'Delete Session Report',
-              onPressed: () {
-                
-                // Get the session data that we are deleting
-                Future<List<PillInformation>> backupSession =
-                    createPillInformationList();
-
-                // Delete it
-                List<PillInformation> empty = [];
-                updatePillInformationList(empty);
-                setState(() {});
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Session Report Deleted")));
-
-                // Saving the session to be deleted in prefs['backup']
-                updateBackup(backupSession as List<PillInformation>);
-              },
-            )),
-            title: const Text(
-              'Session Report',
-              // 2
-            ),
-            centerTitle: true,
-            automaticallyImplyLeading: false,
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.drive_folder_upload),
-                tooltip: 'Export Session Report',
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+          appBar: AppBar(
+              leading: (IconButton(
+                icon: const Icon(Icons.delete),
+                tooltip: 'Delete Session Report',
                 onPressed: () {
-                  dev.log("export report");
+                  // Get the session data that we are deleting
+                  Future<List<PillInformation>> backupSession =
+                      createPillInformationList();
+
+                  // Delete it
+                  List<PillInformation> empty = [];
+                  updatePillInformationList(empty);
+                  setState(() {});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Session Report Deleted")));
+
+                  // Saving the session to be deleted in prefs['backup']
+                  updateBackup(backupSession as List<PillInformation>);
                 },
-              )
-            ]),
-        // body: Center(
-        //     child: ListView.separated(
-        //   itemBuilder: (BuildContext context, int index) {
-        //     final item = widget.pillInfo[index];
-        //     return Dismissible(
-        //       key: Key((item.din.toString() +
-        //           widget.rand.nextInt(10000).toString())),
-        //       onDismissed: (direction) {
-        //         setState(() {
-        //           if (widget.pillInfo.length > 1) {
-        //             widget.pillInfo.removeAt(index);
-        //           }
-        //         });
-        //         updatePillInformationList(widget.pillInfo);
-        //       },
-        //       child: ListTile(
-        //         title: Text(item.description),
-        //         subtitle: Text(item.din),
-        //         trailing: Text(item.count.toString()),
-        //         onTap: () {
-        //           PillInformation tapped = PillInformation(
-        //             din: item.din,
-        //             description: item.description,
-        //             count: item.count,
-        //           );
-        //           ScreenArguments toPass = ScreenArguments(tapped, index);
-        //           //final SharedPreferences prefs = await SharedPreferences.getInstance();
-        //           //prefs.setString('index',index.toString());
-        //           Navigator.push(
-        //             context,
-        //             MaterialPageRoute(
-        //                 builder: (context) => PillInformationReview(),
-        //                 settings: RouteSettings(arguments: toPass)),
-        //           );
-        //         },
-        //       ),
-        //     );
-        //   },
-        //   separatorBuilder: (context, index) {
-        //     return const Divider();
-        //   },
-        //   itemCount: widget.pillInfo.length,
-        // )),
-        body: Center(
-          child: FutureBuilder<List<PillInformation>>(
-            future: createPillInformationList(),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<PillInformation>> snapshot) {
-              Widget children;
-              if (snapshot.hasData) {
-                // if we have data display it
-                children = ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    final items = snapshot.data!;
-                    final item = items[index];
-                    return Dismissible(
-                        key: Key(item.din.toString() +
-                            (Random().nextInt(10000)).toString()),
-                        onDismissed: (direction) {
-                          setState(() {
-                            items.removeAt(index);
-                          });
-                          updatePillInformationList(items);
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("Pill ${item.din} deleted")));
-                        },
-                        background: Container(color: Colors.red),
-                        child: ListTile(
-                            title: Text(item.description),
-                            subtitle: Text(item.din),
-                            trailing: Text(item.count.toString()),
-                            onTap: () {
-                              PillInformation tapped = PillInformation(
-                                din: item.din,
-                                description: item.description,
-                                count: item.count,
-                              );
-                              ScreenArguments toPass =
-                                  ScreenArguments(tapped, index);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        PillInformationReview(),
-                                    settings: RouteSettings(arguments: toPass)),
-                              );
-                            }));
+              )),
+              title: const Text(
+                'Session Report',
+                // 2
+              ),
+              centerTitle: true,
+              automaticallyImplyLeading: false,
+              actions: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.drive_folder_upload),
+                  tooltip: 'Export Session Report',
+                  onPressed: () {
+                    dev.log("export report");
                   },
-                  separatorBuilder: (context, index) {
-                    return const Divider();
-                  },
-                  itemCount: snapshot.data!.length,
+                )
+              ]),
+          // body: Center(
+          //     child: ListView.separated(
+          //   itemBuilder: (BuildContext context, int index) {
+          //     final item = widget.pillInfo[index];
+          //     return Dismissible(
+          //       key: Key((item.din.toString() +
+          //           widget.rand.nextInt(10000).toString())),
+          //       onDismissed: (direction) {
+          //         setState(() {
+          //           if (widget.pillInfo.length > 1) {
+          //             widget.pillInfo.removeAt(index);
+          //           }
+          //         });
+          //         updatePillInformationList(widget.pillInfo);
+          //       },
+          //       child: ListTile(
+          //         title: Text(item.description),
+          //         subtitle: Text(item.din),
+          //         trailing: Text(item.count.toString()),
+          //         onTap: () {
+          //           PillInformation tapped = PillInformation(
+          //             din: item.din,
+          //             description: item.description,
+          //             count: item.count,
+          //           );
+          //           ScreenArguments toPass = ScreenArguments(tapped, index);
+          //           //final SharedPreferences prefs = await SharedPreferences.getInstance();
+          //           //prefs.setString('index',index.toString());
+          //           Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //                 builder: (context) => PillInformationReview(),
+          //                 settings: RouteSettings(arguments: toPass)),
+          //           );
+          //         },
+          //       ),
+          //     );
+          //   },
+          //   separatorBuilder: (context, index) {
+          //     return const Divider();
+          //   },
+          //   itemCount: widget.pillInfo.length,
+          // )),
+          body: Center(
+            child: FutureBuilder<List<PillInformation>>(
+              future: createPillInformationList(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<PillInformation>> snapshot) {
+                Widget children;
+                if (snapshot.hasData) {
+                  // if we have data display it
+                  children = ListView.separated(
+                    itemBuilder: (BuildContext context, int index) {
+                      final items = snapshot.data!;
+                      final item = items[index];
+                      return Dismissible(
+                          key: Key(item.din.toString() +
+                              (Random().nextInt(10000)).toString()),
+                          onDismissed: (direction) {
+                            setState(() {
+                              items.removeAt(index);
+                            });
+                            updatePillInformationList(items);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text("Pill ${item.din} deleted")));
+                          },
+                          background: Container(color: Colors.red),
+                          child: ListTile(
+                              title: Text(item.description),
+                              subtitle: Text(item.din),
+                              trailing: Text(item.count.toString()),
+                              onTap: () {
+                                PillInformation tapped = PillInformation(
+                                  din: item.din,
+                                  description: item.description,
+                                  count: item.count,
+                                );
+                                ScreenArguments toPass =
+                                    ScreenArguments(tapped, index);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PillInformationReview(),
+                                      settings:
+                                          RouteSettings(arguments: toPass)),
+                                );
+                              }));
+                    },
+                    separatorBuilder: (context, index) {
+                      return const Divider();
+                    },
+                    itemCount: snapshot.data!.length,
+                  );
+                } else if (snapshot.hasError) {
+                  // if there is an error display error
+                  children = const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 60,
+                  );
+                } else {
+                  // If we have not yet recieved data or an error, show loading circle
+                  children = const SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return Center(
+                  // Do the actual displaying of the widgets
+                  child: children,
                 );
-              } else if (snapshot.hasError) {
-                // if there is an error display error
-                children = const Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                  size: 60,
-                );
-              } else {
-                // If we have not yet recieved data or an error, show loading circle
-                children = const SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: CircularProgressIndicator(),
-                );
-              }
-              return Center(
-                // Do the actual displaying of the widgets
-                child: children,
-              );
-            },
+              },
+            ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const Home(),
-                    settings: RouteSettings()));
-          },
-          tooltip: 'Add new pill',
-          child: Icon(Icons.add),
-        ));
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const Home(),
+                      settings: RouteSettings()));
+            },
+            tooltip: 'Add new pill',
+            child: Icon(Icons.add),
+          )),
+    );
   }
 }
