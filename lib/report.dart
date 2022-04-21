@@ -25,6 +25,11 @@ void updatePillInformationList(
   prefs.setString('pillcounts', PillInformation.encode(pillInformationList));
 }
 
+void updateBackup(List<PillInformation> pillInformationList) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('backup', PillInformation.encode(pillInformationList));
+}
+
 // class SessionReport extends StatefulWidget {
 //   List<PillInformation> pillInfo;
 //   Random rand = Random();
@@ -48,6 +53,26 @@ class _SessionReportState extends State<SessionReport> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+            leading: (IconButton(
+              icon: const Icon(Icons.delete),
+              tooltip: 'Delete Session Report',
+              onPressed: () {
+                
+                // Get the session data that we are deleting
+                Future<List<PillInformation>> backupSession =
+                    createPillInformationList();
+
+                // Delete it
+                List<PillInformation> empty = [];
+                updatePillInformationList(empty);
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Session Report Deleted")));
+
+                // Saving the session to be deleted in prefs['backup']
+                updateBackup(backupSession as List<PillInformation>);
+              },
+            )),
             title: const Text(
               'Session Report',
               // 2
@@ -55,18 +80,6 @@ class _SessionReportState extends State<SessionReport> {
             centerTitle: true,
             automaticallyImplyLeading: false,
             actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.delete_forever_outlined,
-                    color: Colors.red),
-                tooltip: 'Delete Session Report',
-                onPressed: () {
-                  List<PillInformation> empty = [];
-                  updatePillInformationList(empty);
-                  setState(() {});
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Session Report Deleted")));
-                },
-              ),
               IconButton(
                 icon: const Icon(Icons.drive_folder_upload),
                 tooltip: 'Export Session Report',
