@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>  
     <application
-        android:label="introduction_to_flutter"
+        android:label="CountrAI"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

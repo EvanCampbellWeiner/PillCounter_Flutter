@@ -6,8 +6,8 @@ import 'dart:ui';
 /// Singleton to record size related data
 class CameraViewSingleton {
   static double ratio = 1;
-  static Size screenSize = Size(640,640);
-  static Size inputImageSize = Size(640,640);
+  static Size screenSize = Size(384,384);
+  static Size inputImageSize = Size(384,384);
   static Size get actualPreviewSize =>
       Size(screenSize.width, screenSize.width * ratio);
 }
@@ -44,18 +44,13 @@ class Recognition {
   /// This is the actual location where rectangle is rendered on
   /// the screen
   Rect get renderLocation {
-    // ratioX = screenWidth / imageInputWidth
-    // ratioY = ratioX if image fits screenWidth with aspectRatio = constant
 
-    double ratioX = CameraViewSingleton.ratio;
-    double ratioY = ratioX;
-
-    double transLeft = max(0.1, location.left * ratioX);
-    double transTop = max(0.1, location.top * ratioY);
-    double transWidth = min(
-        location.width * ratioX, CameraViewSingleton.actualPreviewSize.width);
-    double transHeight = min(
-        location.height * ratioY, CameraViewSingleton.actualPreviewSize.height);
+    double transLeft = max(0.1, location.left);
+    double transTop = max(0.1, location.top);
+    double transWidth =
+        location.width;
+    double transHeight =
+        location.height;
 
     Rect transformedRect =
     Rect.fromLTWH(transLeft, transTop, transWidth, transHeight);

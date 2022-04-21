@@ -70,9 +70,11 @@ class _PillCounterState extends State<PillCounter> {
 
     // Creates File Image
     new FileImage(image)
-        .resolve(new ImageConfiguration())
+        .resolve(ImageConfiguration())
         .addListener(ImageStreamListener((ImageInfo info, bool _) {
       setState(() {
+        dev.log("info.image.height is"+info.image.height.toDouble().toString());
+        dev.log("info.image.height is"+info.image.width.toDouble().toString());
         _imageHeight = info.image.height.toDouble();
         _imageWidth = info.image.width.toDouble();
       });
@@ -88,44 +90,20 @@ class _PillCounterState extends State<PillCounter> {
   Future runModel(File image) async {
     int startTime = new DateTime.now().millisecondsSinceEpoch;
     var imageb = (await image.readAsBytes());
-    // var imageBytes = (await rootBundle.load(image.path)).buffer;
     img.Image? oriImage = img.decodeJpg(imageb);
-    // img.Image? image2 = img.decodeJpg(imageb);
     img.Image? resizedImage =
         img.copyResize(oriImage!, height: 384, width: 384);
-    // dev.log("resized image:" + resizedImage.width.toString());
-    // resizedImage.getBytes().shape.reshape([1,640,640,3]);
-    // dev.log("resized image:"+resizedImage.getBytes().shape.toString());
-
     Classifier classifier = await Classifier();
 
     await classifier.loadModel();
-    // if (classifier.interpreter != null && classifier.labels != null) {
-    dev.log("Running predict...");
 
     var results = await classifier.predict(resizedImage);
-    // resizedImage = img.drawRect(resizedImage,results!.first.location.left,results!.first.location.top, results!.first.location.right, results!.first.location.bottom, 0  );
-    // results = classifier.predict(resizedImage) as List?;
     _recognitions = results!;
     if (classifier.interpreter != null) {
       classifier.interpreter!.close();
     }
   }
 
-  onSelect(model) async {
-    setState(() {
-      _busy = true;
-      _model = model;
-      _recognitions = [];
-    });
-
-    if (_image != null)
-      predictImage(_image!);
-    else
-      setState(() {
-        _busy = false;
-      });
-  }
 
   List<Widget> renderBoxes(Size screen) {
     if (_recognitions == null) return [];
@@ -133,24 +111,26 @@ class _PillCounterState extends State<PillCounter> {
 
     // Update Count
     _count = _recognitions.length;
+    dev.log("Factor X with Image Width is"+_imageWidth.toString());
+    dev.log("Factor X with Image Width is"+_imageHeight.toString());
 
-    double factorX = _imageWidth / screen.width * screen.width;
-    double factorY = _imageWidth / screen.width * screen.width;
+    double factorX = _imageWidth/384;
+    double factorY = _imageHeight/384;
     var length = _recognitions.length;
     Color blue = Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions.map((re) {
       Rect rec = re.renderLocation;
       return Positioned(
-        left: (rec.left),
-        top: (rec.top),
-        height: rec.height,
-        width: rec.width,
+        left: (rec.left+rec.left+rec.width-18)/2,
+        top: (rec.top+rec.top+rec.height-18)/2,
+        height: 18,
+        width: 18,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            shape:BoxShape.circle,
             border: Border.all(
               color: blue,
-              width: 2,
+              width: 10,
             ),
           ),
           child: Text(
@@ -166,50 +146,16 @@ class _PillCounterState extends State<PillCounter> {
     }).toList();
   }
 
-  List<Widget> renderKeypoints(Size screen) {
-    if (_recognitions == null) return [];
-    if (_imageHeight == null || _imageWidth == null) return [];
-
-    double factorX = screen.width;
-    double factorY = _imageHeight / _imageWidth * screen.width;
-
-    var lists = <Widget>[];
-    _recognitions.forEach((re) {
-      var color = Color((Random().nextDouble() * 0xFFFFFF).toInt() << 0)
-          .withOpacity(1.0);
-      var list = re["keypoints"].values.map<Widget>((k) {
-        return Positioned(
-          left: k["x"] * factorX - 6,
-          top: k["y"] * factorY - 6,
-          width: 100,
-          height: 12,
-          child: Text(
-            "● ${k["part"]}",
-            style: TextStyle(
-              color: color,
-              fontSize: 12.0,
-            ),
-          ),
-        );
-      }).toList();
-
-      lists..addAll(list);
-    });
-
-    return lists;
-  }
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     List<Widget> stackChildren = [];
-
     stackChildren.add(Positioned(
       top: 0.0,
       left: 0.0,
       width: 384,
-      height: 384,
-      child: _image == null ? Text('No image selected.') : Image.file(_image!),
+      height:384,
+      child: _image == null ? Text('No image selected.') : Image.file(_image!, height:384, width:384, fit:BoxFit.fill),
     ));
     stackChildren.addAll(renderBoxes(size));
 
@@ -261,7 +207,6 @@ class _PillCounterState extends State<PillCounter> {
               MaterialPageRoute<dynamic>(
                   builder: (context) => TakePictureScreen(camera: camera)));
           if (image != null) {
-            dev.log("made it back");
             predictImage(File(image.path));
           }
         },

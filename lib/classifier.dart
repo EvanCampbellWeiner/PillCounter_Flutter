@@ -25,7 +25,7 @@ class Classifier {
   static const int INPUT_SIZE = 384;
 
   /// Result score threshold
-  static const double THRESHOLD = 0;
+  static const double THRESHOLD = 0.25;
 
   /// [ImageProcessor] used to pre-process the image
   late ImageProcessor imageProcessor;
@@ -85,9 +85,7 @@ class Classifier {
 
   /// Pre-process the image
   TensorImage getProcessedImage(TensorImage inputImage) {
-    padSize = max(inputImage.height, inputImage.width);
     imageProcessor = ImageProcessorBuilder()
-          .add(ResizeOp(INPUT_SIZE, INPUT_SIZE, ResizeMethod.BILINEAR))
           .build();
     inputImage = imageProcessor.process(inputImage);
     return inputImage;
@@ -96,19 +94,12 @@ class Classifier {
 
   /// Runs object detection on the input image
   Future<List<dynamic>?> predict(imageLib.Image image) async {
-    // For Logging
-    var predictStartTime = DateTime.now().millisecondsSinceEpoch;
-    var preProcessStart = DateTime.now().millisecondsSinceEpoch;
-
     // Create TensorImage from image
    TensorImage  inputImage = TensorImage(TfLiteType.uint8);
    inputImage.loadImage(image);
     // Pre-process TensorImage
     inputImage = getProcessedImage(inputImage);
 
-    // Logging
-    var preProcessElapsedTime =
-        DateTime.now().millisecondsSinceEpoch - preProcessStart;
 
     // TensorBuffers for output tensors
     TensorBuffer outputLocations = TensorBufferFloat(_outputShapes[1]);
@@ -116,22 +107,6 @@ class Classifier {
     TensorBuffer outputScores = TensorBufferFloat(_outputShapes[0]);
     TensorBuffer numLocations = TensorBufferFloat(_outputShapes[2]);
 
-
-    // dev.log(inputImage.getDataType().toString());
-    // // Inputs object for runForMultipleInputs
-    // // Use [TensorImage.buffer] or [TensorBuffer.buffer] to pass by reference
-    // dev.log(inputImage.buffer.toString());
-
-    // img.Image? oriImage = img.decodeJpg(imageBytes.asUint8List());
-    // img.Image? image2 = img.decodeJpg(imageb);
-    // img.Image? oriImage = img.decodeJpg(imageBytes.asUint8List());
-    // var imgBytes = image.getBytes();
-    //
-    // List<Object> inputs = [imgBytes.first];
-    var image2 = image.getBytes();
-    // inputImage.buffer.asUint8List().reshape([1,640,640,3]);
-    // dev.log(inputImage.tensorBuffer.getBuffer().asUint8List().reshape([1,640,640,3]).toString());
-    // dev.log("Input Image:"+inputImage.tensorBuffer.getBuffer().asInt8List().reshape([1,640,640,3]).toString());
     var inputs = inputImage.buffer.asUint8List();
 
 
@@ -146,9 +121,6 @@ class Classifier {
       2: numLocations.buffer,
       3: outputClasses.buffer,
     };
-    dev.log("HERE");
-
-    // dev.log(outputs[0].toString());
 
     var inferenceTimeStart = DateTime.now().millisecondsSinceEpoch;
 
@@ -170,11 +142,6 @@ class Classifier {
     // Maximum number of results to show
     int resultsCount = min(NUM_RESULTS, 150);
 
-    // Using labelOffset = 1 as ??? at index 0
-    int labelOffset = 1;
-
-    // dev.log("HERE");
-
     // Using bounding box utils for easy conversion of tensorbuffer to List<Rect>
     List<Rect> locations = BoundingBoxUtils.convert(
       tensor: outputLocations,
@@ -182,38 +149,26 @@ class Classifier {
       boundingBoxAxis: 2,
       boundingBoxType: BoundingBoxType.BOUNDARIES,
       coordinateType: CoordinateType.RATIO,
-      height: image.height,
-      width: image.width,
+      height: inputImage.height,
+      width: inputImage.width,
     );
 
     List<Recognition> recognitions = [];
-    var count = 0;
     for (int i = 0; i < resultsCount; i++) {
       // Prediction score
       var score = outputScores.getDoubleValue(i);
-      dev.log(numLocations.buffer.asInt8List.toString());
 
-      if(score > 0.25) {
-        count++;
-        //Label string
-        // var labelIndex = outputClasses.getIntValue(i) + labelOffset;
-        var label = _labels!.elementAt(0);
-        dev.log(recognitions.toString()+"HERE TODAY");
+      if(score > THRESHOLD) {
         // inverse of rect
         // [locations] corresponds to the image size 300 X 300
         // inverseTransformRect transforms it our [inputImage]
         Rect transformedRect = imageProcessor.inverseTransformRect(
-        locations[i], image.height, image.width);
-        // dev.log(recognitions.toString()+"HERE TODAY");
+        locations[i], inputImage.height, inputImage.width);
         recognitions.add(
         Recognition(i, "pill", score, transformedRect),
         );
       }
     }
-
-    dev.log("number of items: "+count.toString());
-    var predictElapsedTime =
-        DateTime.now().millisecondsSinceEpoch - predictStartTime;
 
     return recognitions;
   }
