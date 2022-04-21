@@ -241,9 +241,7 @@ class _PillCounterState extends State<PillCounter> {
                     ? PillInformation.decode(pillReportString)
                     : List.filled(1, pillInfo, growable: true);
                 if (!pillReport.contains(pillInfo)) {
-                  if (pillReport.length >= 1) {
-                    pillReport.add(pillInfo);
-                  }
+                  pillReport.add(pillInfo);
                 }
                 final String result = PillInformation.encode(pillReport);
                 prefs.setString('pillcounts', (result));
