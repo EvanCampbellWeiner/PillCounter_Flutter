@@ -36,11 +36,12 @@ class _PillCounterState extends State<PillCounter> {
   double _imageWidth = 384;
   bool _busy = false;
   int _count = 0;
+  bool _firstVisit = false;
 
   @override
   void initState() {
     super.initState();
-
+    _firstVisit = true;
     _busy = true;
   }
 
@@ -199,27 +200,47 @@ class _PillCounterState extends State<PillCounter> {
     return lists;
   }
 
+  showCamera() async {
+    var camera = await loadCamera();
+    var image = await Navigator.push(
+        context,
+        MaterialPageRoute<dynamic>(
+            builder: (context) => TakePictureScreen(camera: camera)));
+    if (image != null) {
+      dev.log("made it back");
+      setState(() {
+        _firstVisit = false;
+        _image = null;
+        _recognitions = [];
+        _busy = true;
+      });
+
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        await predictImage(File(image.path));
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     List<Widget> stackChildren = [];
+
+    if (_firstVisit) {
+      showCamera();
+    }
+    if (_busy) {
+      stackChildren.add(const Center(child: CircularProgressIndicator()));
+    }
 
     stackChildren.add(Positioned(
       top: 0.0,
       left: 0.0,
       width: 384,
       height: 384,
-      child: _image == null ? Text('No image selected.') : Image.file(_image!),
+      child: _image == null ? Text('') : Image.file(_image!),
     ));
     stackChildren.addAll(renderBoxes(size));
-
-    if (_busy) {
-      stackChildren.add(const Opacity(
-        child: ModalBarrier(dismissible: false, color: Colors.grey),
-        opacity: 0.3,
-      ));
-      stackChildren.add(const Center(child: CircularProgressIndicator()));
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -255,15 +276,7 @@ class _PillCounterState extends State<PillCounter> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          var camera = await loadCamera();
-          var image = await Navigator.push(
-              context,
-              MaterialPageRoute<dynamic>(
-                  builder: (context) => TakePictureScreen(camera: camera)));
-          if (image != null) {
-            dev.log("made it back");
-            predictImage(File(image.path));
-          }
+          showCamera();
         },
         tooltip: 'Pick Image',
         child: Icon(Icons.add_a_photo_outlined),
