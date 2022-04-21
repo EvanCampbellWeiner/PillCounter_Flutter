@@ -19,6 +19,14 @@ Future<List<PillInformation>> createPillInformationList() async {
   return pillReport;
 }
 
+Future<List<PillInformation>> createBackupList() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? backupReportString = prefs.getString('backup');
+  final List<PillInformation> backupReport =
+      PillInformation.decode(backupReportString ?? "");
+  return backupReport;
+}
+
 void updatePillInformationList(
     List<PillInformation> pillInformationList) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -33,9 +41,7 @@ void updateBackup(List<PillInformation> pillInformationList) async {
 // class SessionReport extends StatefulWidget {
 //   List<PillInformation> pillInfo;
 //   Random rand = Random();
-
 //   SessionReport({Key? key, required this.pillInfo}) : super(key: key);
-
 //   @override
 //   _SessionReportState createState() => _SessionReportState();
 // }
@@ -49,6 +55,8 @@ class SessionReport extends StatefulWidget {
 
 class _SessionReportState extends State<SessionReport> {
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
+  bool _archive =
+      false; // Used to determine if there is a deleted report stored.(changes color and func. of undo)
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,22 +64,31 @@ class _SessionReportState extends State<SessionReport> {
             leading: (IconButton(
               icon: const Icon(Icons.delete),
               tooltip: 'Delete Session Report',
-              onPressed: () {
-                
-                // Get the session data that we are deleting
-                Future<List<PillInformation>> backupSession =
-                    createPillInformationList();
-
-                // Delete it
-                List<PillInformation> empty = [];
-                updatePillInformationList(empty);
-                setState(() {});
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Session Report Deleted")));
-
-                // Saving the session to be deleted in prefs['backup']
-                updateBackup(backupSession as List<PillInformation>);
-              },
+              onPressed: () => showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text("Deleting Report"),
+                  content: const Text(
+                      "Are you sure you want to delete the session report?"),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        DeleteReport(context);
+                        _archive = true;
+                        setState(() {});
+                      },
+                      child: const Text('Yes'),
+                    ),
+                  ],
+                ),
+              ),
             )),
             title: const Text(
               'Session Report',
@@ -80,6 +97,38 @@ class _SessionReportState extends State<SessionReport> {
             centerTitle: true,
             automaticallyImplyLeading: false,
             actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.undo),
+                tooltip: 'Recover Deleted Session Report',
+                color: !_archive ? Colors.grey : Colors.white,
+                onPressed: !_archive
+                    ? null
+                    : () => showDialog(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text("Recover Report"),
+                            content: const Text(
+                                "Are you sure you want to recover the deleted report? This will overwrite the current session."),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  RecoverReport(context);
+                                  _archive = false;
+                                  setState(() {});
+                                },
+                                child: const Text('Yes'),
+                              ),
+                            ],
+                          ),
+                        ),
+              ),
               IconButton(
                 icon: const Icon(Icons.drive_folder_upload),
                 tooltip: 'Export Session Report',
@@ -215,4 +264,35 @@ class _SessionReportState extends State<SessionReport> {
           child: Icon(Icons.add),
         ));
   }
+}
+
+// Called when the user clicks "Yes" in the deletion dialog window
+DeleteReport(BuildContext context) async {
+  // Get the session data that we are deleting
+  List<PillInformation> backupSession = await createPillInformationList();
+  // Delete it
+  List<PillInformation> empty = [];
+  updatePillInformationList(empty);
+  // Display snackbar at the bottom
+  ScaffoldMessenger.of(context)
+      .showSnackBar(SnackBar(content: Text("Session Report Deleted")));
+  // Saving the session to be deleted in prefs['backup']
+  updateBackup(backupSession);
+
+  // This needs to change the flag (_archive), before the setState() is called,
+  // so that the button to undo can change colors and functionality.
+}
+
+// Called when the user clicks "Recover" in the recovert dialog window
+RecoverReport(BuildContext context) async {
+  // Getting the list of pills from backup report
+  List<PillInformation> recovered = await createBackupList();
+  // Emptying the backup
+  List<PillInformation> empty = [];
+  updateBackup(empty);
+  // Changing the current session to be the same as that backup
+  updatePillInformationList(recovered);
+  // Display snackbar at bottom
+  ScaffoldMessenger.of(context)
+      .showSnackBar(SnackBar(content: Text("Session Report Recovered")));
 }
