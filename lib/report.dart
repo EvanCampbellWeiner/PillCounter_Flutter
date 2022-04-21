@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'dart:math';
-
+import 'home.dart';
 import 'package:flutter/material.dart';
 import 'package:pillcounter_flutter/pillinformation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,55 +31,84 @@ class _SessionReportState extends State<SessionReport> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Session Report',
-          // 2
-        ),
-        centerTitle: true,
-      ),
-      body: Center(
-          child: ListView.separated(
-                itemBuilder: (BuildContext context, int index) {
-                  final item = widget.pillInfo[index];
-                  return Dismissible(
-                    key: Key((item.din.toString() + widget.rand.nextInt(10000).toString())),
-                    onDismissed: (direction) {
-                      setState(() {
-                        if(widget.pillInfo.length > 1) {
-                          widget.pillInfo.removeAt(index);
-                        }
-                      });
-                      updatePillInformationList(widget.pillInfo);
-                    },
-                    child: ListTile(
-                      title: Text(item.description),
-                      subtitle: Text(item.din),
-                      trailing: Text(item.count.toString()),
-                      onTap: () {
-                        PillInformation tapped = PillInformation(
-                          din: item.din,
-                          description: item.description,
-                          count: item.count,
-                        );
-                        ScreenArguments toPass = ScreenArguments(tapped, index);
-                        //final SharedPreferences prefs = await SharedPreferences.getInstance();
-                        //prefs.setString('index',index.toString());
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PillInformationReview(),
-                              settings: RouteSettings(arguments: toPass)),
-                        );
-                      },
-                    ),
+        appBar: AppBar(
+            title: const Text(
+              'Session Report',
+              // 2
+            ),
+            centerTitle: true,
+            automaticallyImplyLeading: false,
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.delete_forever_outlined,
+                    color: Colors.red),
+                tooltip: 'Delete Session Report',
+                onPressed: () {
+                  List<PillInformation> empty = [];
+                  updatePillInformationList(empty);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.drive_folder_upload),
+                tooltip: 'Export Session Report',
+                onPressed: () {
+                  dev.log("export report");
+                },
+              )
+            ]),
+        body: Center(
+            child: ListView.separated(
+          itemBuilder: (BuildContext context, int index) {
+            final item = widget.pillInfo[index];
+            return Dismissible(
+              key: Key((item.din.toString() +
+                  widget.rand.nextInt(10000).toString())),
+              onDismissed: (direction) {
+                setState(() {
+                  if (widget.pillInfo.length > 1) {
+                    widget.pillInfo.removeAt(index);
+                  }
+                });
+                updatePillInformationList(widget.pillInfo);
+              },
+              child: ListTile(
+                title: Text(item.description),
+                subtitle: Text(item.din),
+                trailing: Text(item.count.toString()),
+                onTap: () {
+                  PillInformation tapped = PillInformation(
+                    din: item.din,
+                    description: item.description,
+                    count: item.count,
+                  );
+                  ScreenArguments toPass = ScreenArguments(tapped, index);
+                  //final SharedPreferences prefs = await SharedPreferences.getInstance();
+                  //prefs.setString('index',index.toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PillInformationReview(),
+                        settings: RouteSettings(arguments: toPass)),
                   );
                 },
-                separatorBuilder: (context, index) {
-                  return const Divider();
-                },
-                itemCount: widget.pillInfo.length,
-              ))
-    );
+              ),
+            );
+          },
+          separatorBuilder: (context, index) {
+            return const Divider();
+          },
+          itemCount: widget.pillInfo.length,
+        )),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const Home(),
+                    settings: RouteSettings()));
+          },
+          tooltip: 'Add new pill',
+          child: Icon(Icons.add),
+        ));
   }
 }
