@@ -8,6 +8,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pillcounter_flutter/pillinformation.dart';
+import 'package:pillcounter_flutter/recognition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
@@ -16,6 +17,7 @@ import 'camerawidgets.dart';
 import 'report.dart';
 
 const String model = "model";
+enum pointColour { red, blue, pink, green }
 
 dynamic _pickImageError;
 late CameraController _cameraController;
@@ -37,6 +39,8 @@ class _PillCounterState extends State<PillCounter> {
   bool _busy = false;
   int _count = 0;
   bool _firstVisit = false;
+  double _slidesize = 14;
+  pointColour? _colour = pointColour.blue;
 
   @override
   void initState() {
@@ -74,8 +78,10 @@ class _PillCounterState extends State<PillCounter> {
         .resolve(ImageConfiguration())
         .addListener(ImageStreamListener((ImageInfo info, bool _) {
       setState(() {
-        dev.log("info.image.height is"+info.image.height.toDouble().toString());
-        dev.log("info.image.height is"+info.image.width.toDouble().toString());
+        dev.log(
+            "info.image.height is" + info.image.height.toDouble().toString());
+        dev.log(
+            "info.image.height is" + info.image.width.toDouble().toString());
         _imageHeight = info.image.height.toDouble();
         _imageWidth = info.image.width.toDouble();
       });
@@ -106,34 +112,37 @@ class _PillCounterState extends State<PillCounter> {
     _count = _recognitions.length;
   }
 
-
   List<Widget> renderBoxes(Size screen) {
     if (_recognitions == null) return [];
     if (_imageHeight == null || _imageWidth == null) return [];
 
     // Update Count
     _count = _recognitions.length;
-    dev.log("Factor X with Image Width is"+_imageWidth.toString());
-    dev.log("Factor X with Image Width is"+_imageHeight.toString());
 
-    double factorX = _imageWidth/384;
-    double factorY = _imageHeight/384;
+    double factorX = _imageWidth / 384;
+    double factorY = _imageHeight / 384;
     var length = _recognitions.length;
-    Color blue = Color.fromRGBO(37, 213, 253, 1.0);
+    Color clr = getColour(_colour);
     return _recognitions.map((re) {
       Rect rec = re.renderLocation;
       return Positioned(
-        left: (rec.left+rec.left+rec.width-14)/2,
-        top: (rec.top+rec.top+rec.height-14)/2,
-        height: 14,
-        width: 14,
-        child: Container(
-          decoration: BoxDecoration(
-            shape:BoxShape.circle,
-            color: Colors.blue,
-            border: Border.all(
-              color: Colors.white,
-              width: 1,
+        left: (rec.left + rec.left + rec.width - _slidesize) / 2,
+        top: (rec.top + rec.top + rec.height - _slidesize) / 2,
+        height: _slidesize,
+        width: _slidesize,
+        child: GestureDetector(
+          onTap: () {
+            _recognitions.remove(re);
+            setState(() {});
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: clr,
+              border: Border.all(
+                color: Colors.white,
+                width: 1,
+              ),
             ),
           ),
         ),
@@ -162,30 +171,73 @@ class _PillCounterState extends State<PillCounter> {
     }
   }
 
+  void onTapEvent(BuildContext context, TapDownDetails details) {
+    //print('${details.globalPosition}');
+    final RenderObject? box = context.findRenderObject();
+    if (box is RenderBox) {
+      final Offset localOffset = box.globalToLocal(details.localPosition);
+      setState(() {
+        _recognitions.add(Recognition(
+            _recognitions.length,
+            "pill",
+            1,
+            Rect.fromCenter(
+                center: localOffset.translate(0, 0), width: 10, height: 10)));
+      });
+    }
+  }
+
+  Color getColour(pointColour? colour) {
+    Color clr = Colors.blue;
+    switch (colour) {
+      case pointColour.red:
+        clr = Colors.red;
+        break;
+      case pointColour.blue:
+        clr = Colors.blue;
+        break;
+      case pointColour.pink:
+        clr = Colors.pink.shade900;
+        break;
+      case pointColour.green:
+        clr = Colors.green;
+        break;
+      default:
+        break;
+    }
+    return clr;
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     List<Widget> stackChildren = [];
     if (_firstVisit) {
       showCamera();
     }
     if (_busy) {
       stackChildren.add(const Center(child: CircularProgressIndicator()));
-    }
+    } else {}
 
     stackChildren.add(Positioned(
       top: 0.0,
       left: 0.0,
       width: 384,
-      height:384,
-      child: _image == null ? Text('') : Image.file(_image!, height:384, width:384, fit:BoxFit.fill),
+      height: 384,
+      child: _image == null
+          ? Text('')
+          : GestureDetector(
+              onTapDown: (TapDownDetails details) =>
+                  onTapEvent(context, details),
+              child: Image.file(_image!,
+                  height: 384, width: 384, fit: BoxFit.fill)),
     ));
     stackChildren.addAll(renderBoxes(size));
 
     return Scaffold(
       appBar: AppBar(
-          title:
-              Text((_count.toString()) + " Pills Counted"),
+          title: Text((_count.toString()) + " Pills Counted"),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.save),
@@ -211,9 +263,170 @@ class _PillCounterState extends State<PillCounter> {
               },
             ),
           ]),
-      body: Stack(
-        children: stackChildren,
-      ),
+      body: Column(children: <Widget>[
+        SizedBox(
+            child: Stack(
+              children: stackChildren,
+            ),
+            width: 384,
+            height: 384),
+        const Padding(
+          padding: EdgeInsets.only(top: 10.0),
+          child: Text(
+            "Point Size",
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+
+        Container(
+            alignment: Alignment.bottomLeft,
+            child: Slider(
+                min: 6.0,
+                max: 32.0,
+                value: _slidesize,
+                onChanged: (value) {
+                  setState(() {
+                    _slidesize = value;
+                  });
+                })),
+        const Text(
+          "Point Colour",
+          style: TextStyle(fontSize: 18),
+        ),
+
+        Row(children: <Widget>[
+          Expanded(
+              child: Radio<pointColour>(
+            value: pointColour.red,
+            groupValue: _colour,
+            onChanged: (pointColour? value) {
+              setState(() {
+                _colour = value;
+              });
+            },
+            fillColor: MaterialStateColor.resolveWith((states) => Colors.red),
+          )),
+          Expanded(
+              child: Radio<pointColour>(
+            value: pointColour.blue,
+            groupValue: _colour,
+            onChanged: (pointColour? value) {
+              setState(() {
+                _colour = value;
+              });
+            },
+            fillColor: MaterialStateColor.resolveWith((states) => Colors.blue),
+          )),
+          Expanded(
+              child: Radio<pointColour>(
+            value: pointColour.pink,
+            groupValue: _colour,
+            onChanged: (pointColour? value) {
+              setState(() {
+                _colour = value;
+              });
+            },
+            fillColor: MaterialStateColor.resolveWith(
+                (states) => Colors.pink.shade900),
+          )),
+          Expanded(
+            child: Radio<pointColour>(
+              value: pointColour.green,
+              groupValue: _colour,
+              onChanged: (pointColour? value) {
+                setState(() {
+                  _colour = value;
+                });
+              },
+              fillColor:
+                  MaterialStateColor.resolveWith((states) => Colors.green),
+            ),
+          )
+        ])
+
+        // Row(children: <Widget>[
+        //   Expanded(
+        //     child: ListView(shrinkWrap: true, children: <Widget>[
+        //       ListTile(
+        //           leading: Radio<pointColour>(
+        //         value: pointColour.red,
+        //         groupValue: _colour,
+        //         onChanged: (pointColour? value) {
+        //           setState(() {
+        //             _colour = value;
+        //           });
+        //         },
+        //         fillColor:
+        //             MaterialStateColor.resolveWith((states) => Colors.red),
+        //       ))
+        //     ]),
+        //   ),
+        //   Expanded(
+        //     child: ListView(shrinkWrap: true, children: <Widget>[
+        //       ListTile(
+        //           leading: Radio<pointColour>(
+        //         value: pointColour.blue,
+        //         groupValue: _colour,
+        //         onChanged: (pointColour? value) {
+        //           setState(() {
+        //             _colour = value;
+        //           });
+        //         },
+        //         fillColor:
+        //             MaterialStateColor.resolveWith((states) => Colors.blue),
+        //       ))
+        //     ]),
+        //   ),
+        //   Expanded(
+        //     child: ListView(shrinkWrap: true, children: <Widget>[
+        //       ListTile(
+        //           leading: Radio<pointColour>(
+        //         value: pointColour.yellow,
+        //         groupValue: _colour,
+        //         onChanged: (pointColour? value) {
+        //           setState(() {
+        //             _colour = value;
+        //           });
+        //         },
+        //         fillColor:
+        //             MaterialStateColor.resolveWith((states) => Colors.yellow),
+        //       ))
+        //     ]),
+        //   ),
+        //   Expanded(
+        //     child: ListView(shrinkWrap: true, children: <Widget>[
+        //       ListTile(
+        //           leading: Radio<pointColour>(
+        //         value: pointColour.green,
+        //         groupValue: _colour,
+        //         onChanged: (pointColour? value) {
+        //           setState(() {
+        //             _colour = value;
+        //           });
+        //         },
+        //         fillColor:
+        //             MaterialStateColor.resolveWith((states) => Colors.green),
+        //       ))
+        //     ]),
+        //   ),
+        //   Expanded(
+        //     child: ListView(shrinkWrap: true, children: <Widget>[
+        //       ListTile(
+        //           leading: Radio<pointColour>(
+        //         value: pointColour.pink,
+        //         groupValue: _colour,
+        //         onChanged: (pointColour? value) {
+        //           setState(() {
+        //             _colour = value;
+        //           });
+        //         },
+        //         fillColor:
+        //             MaterialStateColor.resolveWith((states) => Colors.pink),
+        //       ))
+        //     ]),
+        //   ),
+        // ])
+      ]),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           showCamera();
