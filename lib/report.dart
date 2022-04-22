@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:math';
 import 'home.dart';
 import 'package:flutter/material.dart';
@@ -7,36 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'pillinformation.dart';
 import 'package:http/io_client.dart' as io;
 import 'dart:developer' as dev;
-
-///
-/// UpdatePillInformationList
-///
-Future<List<PillInformation>> createPillInformationList() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final String? pillReportString = prefs.getString('pillcounts');
-  final List<PillInformation> pillReport =
-      PillInformation.decode(pillReportString ?? "");
-  return pillReport;
-}
-
-Future<List<PillInformation>> createBackupList() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final String? backupReportString = prefs.getString('backup');
-  final List<PillInformation> backupReport =
-      PillInformation.decode(backupReportString ?? "");
-  return backupReport;
-}
-
-void updatePillInformationList(
-    List<PillInformation> pillInformationList) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString('pillcounts', PillInformation.encode(pillInformationList));
-}
-
-void updateBackup(List<PillInformation> pillInformationList) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString('backup', PillInformation.encode(pillInformationList));
-}
 
 // class SessionReport extends StatefulWidget {
 //   List<PillInformation> pillInfo;
@@ -67,7 +36,7 @@ class _SessionReportState extends State<SessionReport> {
               onPressed: () => showDialog(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                  title: const Text("Deleting Report"),
+                  title: const Text("Deleting Report"), 
                   content: const Text(
                       "Are you sure you want to delete the session report?"),
                   actions: <Widget>[
@@ -80,7 +49,7 @@ class _SessionReportState extends State<SessionReport> {
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        DeleteReport(context);
+                        deleteReport(context);
                         _archive = true;
                         setState(() {});
                       },
@@ -119,7 +88,7 @@ class _SessionReportState extends State<SessionReport> {
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
-                                  RecoverReport(context);
+                                  recoverReport(context);
                                   _archive = false;
                                   setState(() {});
                                 },
@@ -266,8 +235,39 @@ class _SessionReportState extends State<SessionReport> {
   }
 }
 
+// Returns the list of Pill Information decoded from the string stored at prefs with key 'pillcounts'
+Future<List<PillInformation>> createPillInformationList() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? pillReportString = prefs.getString('pillcounts');
+  final List<PillInformation> pillReport =
+      PillInformation.decode(pillReportString ?? "");
+  return pillReport;
+}
+
+// Returns the list of Pill Information decoded from the string stored at prefs with key 'backup'
+Future<List<PillInformation>> createBackupList() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? backupReportString = prefs.getString('backup');
+  final List<PillInformation> backupReport =
+      PillInformation.decode(backupReportString ?? "");
+  return backupReport;
+}
+
+// Encodes the passed list of Pill Information and saves it to prefs with key 'pillcounts'
+void updatePillInformationList(
+    List<PillInformation> pillInformationList) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('pillcounts', PillInformation.encode(pillInformationList));
+}
+
+// Encodes the passed list of Pill Information and saves it to prefs with key 'backup'
+void updateBackup(List<PillInformation> pillInformationList) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('backup', PillInformation.encode(pillInformationList));
+}
+
 // Called when the user clicks "Yes" in the deletion dialog window
-DeleteReport(BuildContext context) async {
+deleteReport(BuildContext context) async {
   // Get the session data that we are deleting
   List<PillInformation> backupSession = await createPillInformationList();
   // Delete it
@@ -284,7 +284,7 @@ DeleteReport(BuildContext context) async {
 }
 
 // Called when the user clicks "Recover" in the recovert dialog window
-RecoverReport(BuildContext context) async {
+recoverReport(BuildContext context) async {
   // Getting the list of pills from backup report
   List<PillInformation> recovered = await createBackupList();
   // Emptying the backup
