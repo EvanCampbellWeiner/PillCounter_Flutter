@@ -28,8 +28,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final theme = iApothecaTheme.light();
-    return MaterialApp(
-        home: Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: const Text('Pill Counter'),
         centerTitle: true,
@@ -52,6 +51,6 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-    ));
+    );
   }
 }

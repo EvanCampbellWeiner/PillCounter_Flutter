@@ -181,6 +181,7 @@ class _SessionReportState extends State<SessionReport> {
             ),
           ),
           floatingActionButton: FloatingActionButton(
+            backgroundColor:Colors.blue,
             onPressed: () {
               Navigator.push(
                   context,

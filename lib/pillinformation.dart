@@ -107,23 +107,11 @@ class _PillInformationReviewState extends State<PillInformationReview> {
   void initState() {
     setState(() {});
     super.initState();
-    // _dinTextInputController.addListener(() {
-    //   dev.log(_dinTextInputController.text);
-    // });
-    // _descTextInputController.addListener(() {
-    //   dev.log(_descTextInputController.text);
-    // });
-    // _cntTextInputController.addListener(() {
-    //   dev.log(_cntTextInputController.text);
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
-    // _dinTextInputController.text = args.pInfo.din;
-    // _descTextInputController.text = args.pInfo.description;
-    // _cntTextInputController.text = args.pInfo.count.toString();
     _dinTextInputController.text = (_dinTextInputController.text == '')
         ? args.pInfo.din
         : _dinTextInputController.text;
@@ -202,19 +190,6 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                           din: _dinTextInputController.text,
                           description: _descTextInputController.text,
                           count: 0))));
-                  // final String? pillReportString = prefs.getString('pillcounts');
-                  // List<PillInformation> pillReport =
-                  //    pillReportString != null ? PillInformation.decode(pillReportString) : List.filled(1,PillInformation(
-                  //        din: _dinTextInputController.text,
-                  //        description: _descTextInputController.text,
-                  //        count: 0) , growable: true);
-                  //
-                  // pillReport.add(PillInformation(
-                  //     din: _dinTextInputController.text,
-                  //     description: _descTextInputController.text,
-                  //     count: 0));
-                  // final String result = PillInformation.encode(pillReport);
-                  // await prefs.setString('pillcounts', (result));
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -244,7 +219,6 @@ class _PillInformationReviewState extends State<PillInformationReview> {
           ],
         ),
       ),
-      // TODO: Add bottom navigation bar
     );
   }
 }

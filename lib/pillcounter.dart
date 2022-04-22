@@ -172,7 +172,6 @@ class _PillCounterState extends State<PillCounter> {
   }
 
   void onTapEvent(BuildContext context, TapDownDetails details) {
-    //print('${details.globalPosition}');
     final RenderObject? box = context.findRenderObject();
     if (box is RenderBox) {
       final Offset localOffset = box.globalToLocal(details.localPosition);
@@ -343,91 +342,9 @@ class _PillCounterState extends State<PillCounter> {
             ),
           )
         ])
-
-        // Row(children: <Widget>[
-        //   Expanded(
-        //     child: ListView(shrinkWrap: true, children: <Widget>[
-        //       ListTile(
-        //           leading: Radio<pointColour>(
-        //         value: pointColour.red,
-        //         groupValue: _colour,
-        //         onChanged: (pointColour? value) {
-        //           setState(() {
-        //             _colour = value;
-        //           });
-        //         },
-        //         fillColor:
-        //             MaterialStateColor.resolveWith((states) => Colors.red),
-        //       ))
-        //     ]),
-        //   ),
-        //   Expanded(
-        //     child: ListView(shrinkWrap: true, children: <Widget>[
-        //       ListTile(
-        //           leading: Radio<pointColour>(
-        //         value: pointColour.blue,
-        //         groupValue: _colour,
-        //         onChanged: (pointColour? value) {
-        //           setState(() {
-        //             _colour = value;
-        //           });
-        //         },
-        //         fillColor:
-        //             MaterialStateColor.resolveWith((states) => Colors.blue),
-        //       ))
-        //     ]),
-        //   ),
-        //   Expanded(
-        //     child: ListView(shrinkWrap: true, children: <Widget>[
-        //       ListTile(
-        //           leading: Radio<pointColour>(
-        //         value: pointColour.yellow,
-        //         groupValue: _colour,
-        //         onChanged: (pointColour? value) {
-        //           setState(() {
-        //             _colour = value;
-        //           });
-        //         },
-        //         fillColor:
-        //             MaterialStateColor.resolveWith((states) => Colors.yellow),
-        //       ))
-        //     ]),
-        //   ),
-        //   Expanded(
-        //     child: ListView(shrinkWrap: true, children: <Widget>[
-        //       ListTile(
-        //           leading: Radio<pointColour>(
-        //         value: pointColour.green,
-        //         groupValue: _colour,
-        //         onChanged: (pointColour? value) {
-        //           setState(() {
-        //             _colour = value;
-        //           });
-        //         },
-        //         fillColor:
-        //             MaterialStateColor.resolveWith((states) => Colors.green),
-        //       ))
-        //     ]),
-        //   ),
-        //   Expanded(
-        //     child: ListView(shrinkWrap: true, children: <Widget>[
-        //       ListTile(
-        //           leading: Radio<pointColour>(
-        //         value: pointColour.pink,
-        //         groupValue: _colour,
-        //         onChanged: (pointColour? value) {
-        //           setState(() {
-        //             _colour = value;
-        //           });
-        //         },
-        //         fillColor:
-        //             MaterialStateColor.resolveWith((states) => Colors.pink),
-        //       ))
-        //     ]),
-        //   ),
-        // ])
       ]),
       floatingActionButton: FloatingActionButton(
+        backgroundColor:Colors.blue,
         onPressed: () async {
           showCamera();
         },

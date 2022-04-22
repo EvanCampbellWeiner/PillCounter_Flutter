@@ -55,9 +55,9 @@ class Classifier {
             MODEL_FILE_NAME,
             options: InterpreterOptions()..threads = 1,
           );
-      dev.log("Is allocated: "+_interpreter!.isAllocated.toString());
-
-      dev.log("Input tensors"+_interpreter!.getInputTensors().toString());
+      // dev.log("Is allocated: "+_interpreter!.isAllocated.toString());
+      //
+      // dev.log("Input tensors"+_interpreter!.getInputTensors().toString());
       var outputTensors = _interpreter!.getOutputTensors();
       _outputShapes = [];
       _outputTypes = [];
@@ -65,7 +65,7 @@ class Classifier {
         _outputShapes.add(tensor.shape);
         _outputTypes.add(tensor.type);
       });
-      dev.log(_outputShapes.toString()+" output shapes");
+      // dev.log(_outputShapes.toString()+" output shapes");
     } catch (e) {
       print("Error while creating interpreter: $e");
     }
@@ -110,9 +110,9 @@ class Classifier {
     var inputs = inputImage.buffer.asUint8List();
 
 
-    dev.log("Input Tensors are: " + _interpreter!.getInputTensors().toString());
-    dev.log("Input Shape is:" + inputs.shape.toString());
-    dev.log("Input Type is:" + inputs.runtimeType.toString());
+    // dev.log("Input Tensors are: " + _interpreter!.getInputTensors().toString());
+    // dev.log("Input Shape is:" + inputs.shape.toString());
+    // dev.log("Input Type is:" + inputs.runtimeType.toString());
 
     // Outputs map
     Map<int, Object> outputs = {
@@ -126,10 +126,10 @@ class Classifier {
 
     // dev.log();
     // dev.log(tensorImage.buffer.asUint8List());
-    dev.log("Inputs:"+inputs.toString());
-    dev.log("Interpreter input tensors:"+_interpreter!.getInputTensors().toString());
-    dev.log("Output Hash Map: "+ outputs.runtimeType.toString());
-    dev.log("Output Shape: "+outputs[0]!.toString());
+    // dev.log("Inputs:"+inputs.toString());
+    // dev.log("Interpreter input tensors:"+_interpreter!.getInputTensors().toString());
+    // dev.log("Output Hash Map: "+ outputs.runtimeType.toString());
+    // dev.log("Output Shape: "+outputs[0]!.toString());
 
 
     // run inference
