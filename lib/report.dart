@@ -1,12 +1,18 @@
+import 'dart:io';
 import 'dart:math';
+import 'package:path_provider/path_provider.dart';
 import 'home.dart';
 import 'package:flutter/material.dart';
 import 'package:pillcounter_flutter/pillinformation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pillinformation.dart';
-import 'package:http/io_client.dart' as io;
+import 'dart:async';
 import 'dart:developer' as dev;
+import 'package:share_plus/share_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:csv/csv.dart';
 
+bool permissionGranted = false;
 
 class SessionReport extends StatefulWidget {
   SessionReport({Key? key}) : super(key: key);
@@ -17,8 +23,7 @@ class SessionReport extends StatefulWidget {
 
 class _SessionReportState extends State<SessionReport> {
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
-  bool _archive =
-      false; // Used to determine if there is a deleted report stored.(changes color and func. of undo)
+  bool _archive = false; // Used to determine if there is a deleted report stored.(changes color and func. of undo)
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -99,9 +104,9 @@ class _SessionReportState extends State<SessionReport> {
                 icon: const Icon(Icons.drive_folder_upload),
                 tooltip: 'Export Session Report',
                 onPressed: () {
-                  dev.log("export report");
+                  shareSessionReport();
                 },
-              )]),
+          )]),
           body: Center(
             child: FutureBuilder<List<PillInformation>>(
               future: createPillInformationList(),
@@ -190,7 +195,11 @@ class _SessionReportState extends State<SessionReport> {
   }
 }
 
-// Returns the list of Pill Information decoded from the string stored at prefs with key 'pillcounts'
+// createPillInformationList
+// Purpose: Used by SessionReport's build() method to read the latest version of
+// the Session Report from disk.
+//
+// Returns: Returns a List of PillInformation objects as a Future
 Future<List<PillInformation>> createPillInformationList() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? pillReportString = prefs.getString('pillcounts');
@@ -208,7 +217,11 @@ Future<List<PillInformation>> createBackupList() async {
   return backupReport;
 }
 
-// Encodes the passed list of Pill Information and saves it to prefs with key 'pillcounts'
+// updatePillInformationList
+// Purpose: Accepts a List of PillInformation objects and writes it to disk as
+// the Session Report.
+//
+// Returns: Nothing
 void updatePillInformationList(
     List<PillInformation> pillInformationList) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -250,4 +263,75 @@ recoverReport(BuildContext context) async {
   // Display snackbar at bottom
   ScaffoldMessenger.of(context)
       .showSnackBar(SnackBar(content: Text("Session Report Recovered")));
+}
+
+void shareSessionReport() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.getString('pillcounts');
+  final String? pillReportString = prefs.getString('pillcounts');
+  final List<PillInformation> pillReport =
+      PillInformation.decode(pillReportString ?? "");
+  if (await getStoragePermission()) {
+    if (Platform.isAndroid) {
+      File file = await convertToCSV(pillReport);
+      String fileName = file.absolute.toString();
+      fileName = fileName.substring(7, fileName.length - 1);
+      if (fileName == "") {
+        dev.log(
+            "Error when exporting Session Report: bad fileName: " + fileName);
+      } else if (!(await file.exists())) {
+        dev.log("Error when exporting Session Report: File doesn't exist.");
+      } else {
+        Share.shareFiles([fileName]);
+      }
+    }
+  }
+}
+
+Future<File> convertToCSV(List<PillInformation> pillReport) async {
+  // Check if the user granted permission
+  String fileName = "";
+  // To convert to Csv string all values must be in a List<List<dynamic>>
+  // Populate the List<List<dynamic>> with values from pillReport
+  List<List<dynamic>> _rows = List.generate(
+      pillReport.length,
+      (index) => index == 0
+          ? ["DIN", "Description", "Count"]
+          : [
+              pillReport[index].din,
+              pillReport[index].description,
+              pillReport[index].count.toString()
+            ]);
+
+  String csv = const ListToCsvConverter().convert(_rows);
+
+  // Store the file
+  // Strictly for Android - iOS is differnt.
+  // if (Platform.isAndroid) {
+  // String directory = ((await getExternalStorageDirectory())!.absolute.toString());
+
+  String directory = (await getTemporaryDirectory()).toString();
+  // directory looks like "Directory: 'some/path'" but we want
+  // "some/path" so we extract the directory from the string
+  directory = directory.substring(12, directory.length - 1);
+  DateTime now = DateTime.now();
+  String date = "${now.month}-${now.day}-${now.year}";
+  fileName = directory + "/SessionReport_" + date + ".csv";
+  File file = File(fileName);
+  file = await file.writeAsString(csv);
+  dev.log("CSV: " + csv);
+  final contents = await file.readAsString();
+  dev.log("Contents: " + contents);
+  return file;
+}
+
+Future<bool> getStoragePermission() async {
+  if (await Permission.storage.request().isGranted) {
+    permissionGranted = true;
+  } else if (await Permission.storage.request().isPermanentlyDenied) {
+    await openAppSettings();
+  } else if (await Permission.storage.request().isDenied) {
+    permissionGranted = false;
+  }
+  return permissionGranted;
 }
