@@ -36,11 +36,12 @@ class _PillCounterState extends State<PillCounter> {
   double _imageWidth = 384;
   bool _busy = false;
   int _count = 0;
+  bool _firstVisit = false;
 
   @override
   void initState() {
     super.initState();
-
+    _firstVisit = true;
     _busy = true;
   }
 
@@ -102,6 +103,7 @@ class _PillCounterState extends State<PillCounter> {
     if (classifier.interpreter != null) {
       classifier.interpreter!.close();
     }
+    _count = _recognitions.length;
   }
 
 
@@ -121,24 +123,17 @@ class _PillCounterState extends State<PillCounter> {
     return _recognitions.map((re) {
       Rect rec = re.renderLocation;
       return Positioned(
-        left: (rec.left+rec.left+rec.width-18)/2,
-        top: (rec.top+rec.top+rec.height-18)/2,
-        height: 18,
-        width: 18,
+        left: (rec.left+rec.left+rec.width-14)/2,
+        top: (rec.top+rec.top+rec.height-14)/2,
+        height: 14,
+        width: 14,
         child: Container(
           decoration: BoxDecoration(
             shape:BoxShape.circle,
+            color: Colors.blue,
             border: Border.all(
-              color: blue,
-              width: 10,
-            ),
-          ),
-          child: Text(
-            "${(re.id + 1).toStringAsFixed(0)}",
-            style: TextStyle(
-              background: Paint()..color = blue,
-              color: Colors.red,
-              fontSize: re.id == length - 1 ? 14.0 : 10,
+              color: Colors.white,
+              width: 1,
             ),
           ),
         ),
@@ -146,31 +141,51 @@ class _PillCounterState extends State<PillCounter> {
     }).toList();
   }
 
+  showCamera() async {
+    var camera = await loadCamera();
+    var image = await Navigator.push(
+        context,
+        MaterialPageRoute<dynamic>(
+            builder: (context) => TakePictureScreen(camera: camera)));
+    if (image != null) {
+      dev.log("made it back");
+      setState(() {
+        _firstVisit = false;
+        _image = null;
+        _recognitions = [];
+        _busy = true;
+      });
+
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        await predictImage(File(image.path));
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     List<Widget> stackChildren = [];
+    if (_firstVisit) {
+      showCamera();
+    }
+    if (_busy) {
+      stackChildren.add(const Center(child: CircularProgressIndicator()));
+    }
+
     stackChildren.add(Positioned(
       top: 0.0,
       left: 0.0,
       width: 384,
       height:384,
-      child: _image == null ? Text('No image selected.') : Image.file(_image!, height:384, width:384, fit:BoxFit.fill),
+      child: _image == null ? Text('') : Image.file(_image!, height:384, width:384, fit:BoxFit.fill),
     ));
     stackChildren.addAll(renderBoxes(size));
-
-    if (_busy) {
-      stackChildren.add(const Opacity(
-        child: ModalBarrier(dismissible: false, color: Colors.grey),
-        opacity: 0.3,
-      ));
-      stackChildren.add(const Center(child: CircularProgressIndicator()));
-    }
 
     return Scaffold(
       appBar: AppBar(
           title:
-              Text((_recognitions.length.toString() ?? "0") + " Pills Counted"),
+              Text((_count.toString()) + " Pills Counted"),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.save),
@@ -201,14 +216,7 @@ class _PillCounterState extends State<PillCounter> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          var camera = await loadCamera();
-          var image = await Navigator.push(
-              context,
-              MaterialPageRoute<dynamic>(
-                  builder: (context) => TakePictureScreen(camera: camera)));
-          if (image != null) {
-            predictImage(File(image.path));
-          }
+          showCamera();
         },
         tooltip: 'Pick Image',
         child: Icon(Icons.add_a_photo_outlined),
