@@ -126,6 +126,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           }
         },
         child: const Icon(Icons.camera_alt),
+        backgroundColor: Colors.blue,
 
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
