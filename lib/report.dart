@@ -23,90 +23,92 @@ class SessionReport extends StatefulWidget {
 
 class _SessionReportState extends State<SessionReport> {
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
-  bool _archive = false; // Used to determine if there is a deleted report stored.(changes color and func. of undo)
+  bool _archive =
+      false; // Used to determine if there is a deleted report stored.(changes color and func. of undo)
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () async {
-          return false;
-        },
-        child: Scaffold(
-        appBar: AppBar(
-            leading: (IconButton(
-              icon: const Icon(Icons.delete),
-              tooltip: 'Delete Session Report',
-              onPressed: () => showDialog(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: const Text("Deleting Report"), 
-                  content: const Text(
-                      "Are you sure you want to delete the session report?"),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        deleteReport(context);
-                        _archive = true;
-                        setState(() {});
-                      },
-                      child: const Text('Yes'),
-                    ),
-                  ],
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+          appBar: AppBar(
+              leading: (IconButton(
+                icon: const Icon(Icons.delete),
+                tooltip: 'Delete Session Report',
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text("Deleting Report"),
+                    content: const Text(
+                        "Are you sure you want to delete the session report?"),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          deleteReport(context);
+                          _archive = true;
+                          setState(() {});
+                        },
+                        child: const Text('Yes'),
+                      ),
+                    ],
+                  ),
                 ),
+              )),
+              title: const Text(
+                'Session Report',
+                // 2
               ),
-            )),
-            title: const Text(
-              'Session Report',
-              // 2
-            ),
-            centerTitle: true,
-            automaticallyImplyLeading: false,
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.undo),
-                tooltip: 'Recover Deleted Session Report',
-                color: !_archive ? Colors.grey : Colors.white,
-                onPressed: !_archive
-                    ? null
-                    : () => showDialog(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text("Recover Report"),
-                            content: const Text(
-                                "Are you sure you want to recover the deleted report? This will overwrite the current session."),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  recoverReport(context);
-                                  _archive = false;
-                                  setState(() {});
-                                },
-                                child: const Text('Yes'),
-                              ),
-                            ],
+              centerTitle: true,
+              automaticallyImplyLeading: false,
+              actions: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.undo),
+                  tooltip: 'Recover Deleted Session Report',
+                  color: !_archive ? Colors.grey : Colors.white,
+                  onPressed: !_archive
+                      ? null
+                      : () => showDialog(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text("Recover Report"),
+                              content: const Text(
+                                  "Are you sure you want to recover the deleted report? This will overwrite the current session."),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    recoverReport(context);
+                                    _archive = false;
+                                    setState(() {});
+                                  },
+                                  child: const Text('Yes'),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.drive_folder_upload),
-                tooltip: 'Export Session Report',
-                onPressed: () {
-                  shareSessionReport();
-                },
-          )]),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.drive_folder_upload),
+                  tooltip: 'Export Session Report',
+                  onPressed: () {
+                    shareSessionReport();
+                  },
+                )
+              ]),
           body: Center(
             child: FutureBuilder<List<PillInformation>>(
               future: createPillInformationList(),
@@ -181,7 +183,7 @@ class _SessionReportState extends State<SessionReport> {
             ),
           ),
           floatingActionButton: FloatingActionButton(
-            backgroundColor:Colors.blue,
+            backgroundColor: Colors.blue,
             onPressed: () {
               Navigator.push(
                   context,
@@ -296,14 +298,13 @@ Future<File> convertToCSV(List<PillInformation> pillReport) async {
   // Populate the List<List<dynamic>> with values from pillReport
   List<List<dynamic>> _rows = List.generate(
       pillReport.length,
-      (index) => index == 0
-          ? ["DIN", "Description", "Count"]
-          : [
-              pillReport[index].din,
-              pillReport[index].description,
-              pillReport[index].count.toString()
-            ]);
+      (index) => [
+            pillReport[index].din,
+            pillReport[index].description,
+            pillReport[index].count.toString()
+          ]);
 
+  _rows.insert(0, ["DIN", "Description", "Count"]);
   String csv = const ListToCsvConverter().convert(_rows);
 
   // Store the file
