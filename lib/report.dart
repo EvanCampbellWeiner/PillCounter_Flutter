@@ -39,7 +39,7 @@ class _SessionReportState extends State<SessionReport> {
                 onPressed: () => showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
-                    title: const Text("Deleting Report"),
+                    title: const Text("Deleting Report", style:TextStyle(color:Colors.black)),
                     content: const Text(
                         "Are you sure you want to delete the session report?"),
                     actions: <Widget>[
@@ -78,7 +78,7 @@ class _SessionReportState extends State<SessionReport> {
                       : () => showDialog(
                             context: context,
                             builder: (BuildContext context) => AlertDialog(
-                              title: const Text("Recover Report"),
+                              title: const Text("Recover Report", style:TextStyle(color:Colors.black)),
                               content: const Text(
                                   "Are you sure you want to recover the deleted report? This will overwrite the current session."),
                               actions: <Widget>[
