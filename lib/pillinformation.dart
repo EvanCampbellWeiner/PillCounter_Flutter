@@ -235,7 +235,6 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 25),
             ElevatedButton(
               onPressed: () async {
                 if (args.ind == null) {
