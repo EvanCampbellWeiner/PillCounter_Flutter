@@ -1,3 +1,7 @@
+/// Adapted from code by Amish Garg 
+/// Reference: https://github.com/am15h/object_detection_flutter  
+/// 
+
 /// recognition.dart
 ///
 /// Contains Recognition and CameraViewSingleton classes
