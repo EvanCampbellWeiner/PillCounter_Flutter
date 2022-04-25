@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'fetch_pill_info_test.mocks.dart';
 
 void main() {
-  testWidgets('finds title widget', (WidgetTester tester) async {
+  testWidgets('loads the page', (WidgetTester tester) async {
       final PillInformation pillinfo = PillInformation(din:'00000019', description:"Random Pill");
       final PillInformation pillinfo2 = PillInformation(din:'00000020', description:"Random Pill2");
       List<PillInformation> list = List.empty(growable:true);

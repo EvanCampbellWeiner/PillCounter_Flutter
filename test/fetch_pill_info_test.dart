@@ -12,7 +12,7 @@ void main() {
   group('fetchPillInformation: ', ()
   {
     test(
-        'returns a pill information object if the http call completes successfully',
+        'can make pill object from cdd return',
             () async {
           final client = MockClient();
 

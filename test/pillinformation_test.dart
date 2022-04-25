@@ -9,7 +9,7 @@ import 'package:pillcounter_flutter/pillinformation.dart';
 // Create new instances of this class in each test.
 @GenerateMocks([http.Client])
 void main() {
-  testWidgets('finds saved input', (WidgetTester tester) async {
+  testWidgets('loads with pill data', (WidgetTester tester) async {
     final PillInformation pillinfo = PillInformation(din:'00000019', description:"Random Pill");
 
     await tester.pumpWidget(MaterialApp(
