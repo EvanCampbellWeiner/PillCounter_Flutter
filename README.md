@@ -26,7 +26,8 @@ Referenced From: Camera[https://pub.dev/packages/camera]
 Purpose: 
 - This is for getting permission to store the exported session. 
 Notes: 
-- It has very specific installation instructions for Android and iOS. 
+- Android:
+- iOS: It has very specific installation instructions for Android and iOS. 
 
 Android:
 - Make sure the android/app/build.gradle has
