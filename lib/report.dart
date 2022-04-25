@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:path_provider/path_provider.dart';
-import 'home.dart';
+import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:pillcounter_flutter/pillinformation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -321,9 +321,6 @@ Future<File> convertToCSV(List<PillInformation> pillReport) async {
   fileName = directory + "/SessionReport_" + date + ".csv";
   File file = File(fileName);
   file = await file.writeAsString(csv);
-  dev.log("CSV: " + csv);
-  final contents = await file.readAsString();
-  dev.log("Contents: " + contents);
   return file;
 }
 

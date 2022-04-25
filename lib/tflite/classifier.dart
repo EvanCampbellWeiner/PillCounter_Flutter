@@ -1,13 +1,11 @@
 
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as imageLib;
-import 'package:pillcounter_flutter/recognition.dart';
-import './tensorflow2.dart';
+import 'package:pillcounter_flutter/tflite/recognition.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 /// Classifier

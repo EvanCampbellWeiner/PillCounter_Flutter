@@ -1,18 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:developer' as dev;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pillcounter_flutter/pillinformation.dart';
-import 'package:pillcounter_flutter/recognition.dart';
+import 'package:pillcounter_flutter/tflite/recognition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
-import 'classifier.dart';
+import 'tflite/classifier.dart';
 import 'camerawidgets.dart';
 import 'report.dart';
 

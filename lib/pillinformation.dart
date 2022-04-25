@@ -3,13 +3,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/io_client.dart' as io;
-import 'package:path/path.dart';
-import 'main.dart';
-import 'camerawidgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pillcounter.dart';
 import 'dart:developer' as dev;
@@ -93,7 +89,6 @@ class PillInformationReview extends StatefulWidget {
   _PillInformationReviewState createState() => _PillInformationReviewState();
 }
 
-//TODO: Create a From component consisting of TextField components populated with Pill Information and present to user
 /**
    Pill Information Review State
    Purpose: Creates a form to allow users to review pill information 

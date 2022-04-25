@@ -1,7 +1,13 @@
+/**
+ * File Name:
+ *
+ * Description:
+ *
+ *
+ */
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'report.dart';
-import 'main.dart';
 import 'dart:io';
 import 'dart:developer' as dev;
 import 'package:image_picker/image_picker.dart';
@@ -32,9 +38,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   void initState() {
-    super.initState();
-    // To display the current output from the Camera,
-    // create a CameraController.
+      super.initState();
+      // To display the current output from the Camera,
+      // create a CameraController.
     _cameraController = CameraController(
       // Get a specific camera from the list of available cameras.
       widget.camera,
@@ -91,6 +97,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           ),
         ]
       ),
+
       // You must wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner until the
       // controller has finished initializing.

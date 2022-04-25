@@ -1,24 +1,14 @@
 import 'dart:async';
-
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'iapotheca_theme.dart';
-
-List<CameraDescription> cameras = [];
+import 'theme/iapotheca_theme.dart';
+import 'pillinformation.dart';
+import 'report.dart';
 
 /**
    Main | 
    Purpose: Loads first homescreen with global settings.
  */
 Future<void> main() async {
-  // Ensure that plugin services are initialized so that `availableCameras()`
-  // can be called before `runApp()`
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // // Obtain a list of the available cameras on the device.
-  cameras = await availableCameras();
-
   // runApp(const TfliteScreen());
   runApp(const HomeScreen());
 }
@@ -37,6 +27,58 @@ class HomeScreen extends StatelessWidget {
       theme: theme,
       title: 'CountrAI',
       home: const Home(), // home.dart KYLE (added pill in params)
+    );
+  }
+}
+
+/**
+ * Home Class |
+ * Purpose: Constructs and contains the State for Home.
+ */
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+/**
+ * HomeState |
+ * Purpose: Contains the information for the Home Class to then be used by the
+ * HomeScreen widget in main.dart
+ */
+class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = iApothecaTheme.light();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Pill Counter'),
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+              icon: const Icon(Icons.list_alt),
+              tooltip: 'Go To Report',
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SessionReport()));
+              })
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: const [
+            DINInputForm(),
+          ],
+        ),
+      ),
     );
   }
 }
