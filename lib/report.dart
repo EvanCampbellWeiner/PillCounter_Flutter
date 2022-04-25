@@ -1,3 +1,12 @@
+/// report.dart
+///
+/// Contains build method and supporting functions for the Session Report page.
+/// The Session Report is a List of Pill Information objects that gets saved to
+/// and retrieved from disk under the key 'pillcounts'.
+/// A backup of the Session Report is also created and accessible under the key
+/// 'backup'
+///
+
 import 'dart:io';
 import 'dart:math';
 import 'package:path_provider/path_provider.dart';
@@ -23,8 +32,18 @@ class SessionReport extends StatefulWidget {
 
 class _SessionReportState extends State<SessionReport> {
   Future<SharedPreferences> prefs = SharedPreferences.getInstance();
-  bool _archive =
-      false; // Used to determine if there is a deleted report stored.(changes color and func. of undo)
+  // Used to determine if there is a deleted report stored.
+  bool _archive = false;
+
+  // Rebuilds the screen
+  // Rebuilds whenever setState() is called.
+  // The body contains a FutureBuilder widget whose future is
+  // getPillInformationList().
+  // Depending on getPillInformationLists()'s returned value, the widget assigns
+  // different Widget subtrees to the children Widget.
+  // The FutureBuilder then returns the children Widget, this allows build() to
+  // display different Widgets depending on the results of the FutureBuilder's
+  // future property.
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -39,7 +58,8 @@ class _SessionReportState extends State<SessionReport> {
                 onPressed: () => showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
-                    title: const Text("Deleting Report", style:TextStyle(color:Colors.black)),
+                    title: const Text("Deleting Report",
+                        style: TextStyle(color: Colors.black)),
                     content: const Text(
                         "Are you sure you want to delete the session report?"),
                     actions: <Widget>[
@@ -78,7 +98,8 @@ class _SessionReportState extends State<SessionReport> {
                       : () => showDialog(
                             context: context,
                             builder: (BuildContext context) => AlertDialog(
-                              title: const Text("Recover Report", style:TextStyle(color:Colors.black)),
+                              title: const Text("Recover Report",
+                                  style: TextStyle(color: Colors.black)),
                               content: const Text(
                                   "Are you sure you want to recover the deleted report? This will overwrite the current session."),
                               actions: <Widget>[
@@ -111,7 +132,7 @@ class _SessionReportState extends State<SessionReport> {
               ]),
           body: Center(
             child: FutureBuilder<List<PillInformation>>(
-              future: createPillInformationList(),
+              future: getPillInformationList(),
               builder: (BuildContext context,
                   AsyncSnapshot<List<PillInformation>> snapshot) {
                 Widget children;
@@ -198,12 +219,13 @@ class _SessionReportState extends State<SessionReport> {
   }
 }
 
-// createPillInformationList
-// Purpose: Used by SessionReport's build() method to read the latest version of
-// the Session Report from disk.
-//
-// Returns: Returns a List of PillInformation objects as a Future
-Future<List<PillInformation>> createPillInformationList() async {
+/// getPillInformationList
+///
+/// Purpose: Used by SessionReport's build() method to read the latest version of
+/// the Session Report from disk.
+///
+/// Returns: Returns a List of PillInformation objects as a Future
+Future<List<PillInformation>> getPillInformationList() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? pillReportString = prefs.getString('pillcounts');
   final List<PillInformation> pillReport =
@@ -211,8 +233,12 @@ Future<List<PillInformation>> createPillInformationList() async {
   return pillReport;
 }
 
-// Returns the list of Pill Information decoded from the string stored at prefs with key 'backup'
-Future<List<PillInformation>> createBackupList() async {
+/// retrieveBackupList
+///
+/// Purpose: Retrieves the Session Report backup from disk
+///
+/// Returns: the list of Pill Information decoded from the string stored at prefs with key 'backup'
+Future<List<PillInformation>> retrieveBackupList() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? backupReportString = prefs.getString('backup');
   final List<PillInformation> backupReport =
@@ -220,27 +246,36 @@ Future<List<PillInformation>> createBackupList() async {
   return backupReport;
 }
 
-// updatePillInformationList
-// Purpose: Accepts a List of PillInformation objects and writes it to disk as
-// the Session Report.
-//
-// Returns: Nothing
+/// updatePillInformationList
+///
+/// Purpose: Accepts a List of PillInformation objects and writes it to disk as
+/// the Session Report.
+///
+/// Returns: Nothing
 void updatePillInformationList(
     List<PillInformation> pillInformationList) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString('pillcounts', PillInformation.encode(pillInformationList));
 }
 
-// Encodes the passed list of Pill Information and saves it to prefs with key 'backup'
+/// updateBackup
+///
+/// Purpose: Encodes the passed list of Pill Information and saves it to prefs with key 'backup'
+///
+/// Returns: nothing
 void updateBackup(List<PillInformation> pillInformationList) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString('backup', PillInformation.encode(pillInformationList));
 }
 
-// Called when the user clicks "Yes" in the deletion dialog window
+/// deleteReport
+///
+/// Purpose: Called when the user clicks "Yes" in the deletion dialog window
+///
+/// Returns: nothing
 deleteReport(BuildContext context) async {
   // Get the session data that we are deleting
-  List<PillInformation> backupSession = await createPillInformationList();
+  List<PillInformation> backupSession = await getPillInformationList();
   // Delete it
   List<PillInformation> empty = [];
   updatePillInformationList(empty);
@@ -254,10 +289,15 @@ deleteReport(BuildContext context) async {
   // so that the button to undo can change colors and functionality.
 }
 
-// Called when the user clicks "Recover" in the recovert dialog window
-recoverReport(BuildContext context) async {
+/// recoverReport
+///
+/// Purpose: Manages the retrieving of the backup from disk, and then removes the
+/// backup from disk after recovering the data.
+///
+/// Returns: nothing
+void recoverReport(BuildContext context) async {
   // Getting the list of pills from backup report
-  List<PillInformation> recovered = await createBackupList();
+  List<PillInformation> recovered = await retrieveBackupList();
   // Emptying the backup
   List<PillInformation> empty = [];
   updateBackup(empty);
@@ -268,6 +308,15 @@ recoverReport(BuildContext context) async {
       .showSnackBar(SnackBar(content: Text("Session Report Recovered")));
 }
 
+/// shareSessionReport
+///
+/// Purpose: Retrieves a List of PillInformation objects that are saved on disk,
+/// requests permission to access device storage, then converts the List of
+/// PillInformation objects to a CSV-formatted string, and saves it to temporary
+/// storage as a csv file. The csv file is then exported using the share_plus
+/// package.
+///
+/// Returns: nothing
 void shareSessionReport() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.getString('pillcounts');
@@ -291,8 +340,18 @@ void shareSessionReport() async {
   }
 }
 
+/// convertToCSV
+///
+/// Purpose: Given a List of Pill Information, List<PillInformation>, generates
+/// a List of Lists whose values represent the Pill Information,
+/// List<List<dynamic>>, and converts it to a CSV-formatted string.
+/// A file is created at the devices' temporary directory and named using
+/// today's date.
+/// This CSV-formatted String is written to a File.
+///
+/// Returns: A Future<File> is returned, representing the File that the List
+/// of Pill Information has been saved to.
 Future<File> convertToCSV(List<PillInformation> pillReport) async {
-  // Check if the user granted permission
   String fileName = "";
   // To convert to Csv string all values must be in a List<List<dynamic>>
   // Populate the List<List<dynamic>> with values from pillReport
@@ -308,10 +367,6 @@ Future<File> convertToCSV(List<PillInformation> pillReport) async {
   String csv = const ListToCsvConverter().convert(_rows);
 
   // Store the file
-  // Strictly for Android - iOS is differnt.
-  // if (Platform.isAndroid) {
-  // String directory = ((await getExternalStorageDirectory())!.absolute.toString());
-
   String directory = (await getTemporaryDirectory()).toString();
   // directory looks like "Directory: 'some/path'" but we want
   // "some/path" so we extract the directory from the string
@@ -324,6 +379,16 @@ Future<File> convertToCSV(List<PillInformation> pillReport) async {
   return file;
 }
 
+/// getStoragePermission
+///
+/// Purpose: Used to prompt the user for external storage permission.
+/// If granted, returns true.
+/// If the app settings are set to permanently deny, opens up the app settings
+/// so that the user may alter the app's permissions.
+/// If denied, returns false.
+///
+/// Returns: A Future<bool> is returned, representing the user's response to
+/// the request.
 Future<bool> getStoragePermission() async {
   if (await Permission.storage.request().isGranted) {
     permissionGranted = true;

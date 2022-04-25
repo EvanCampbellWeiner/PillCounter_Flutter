@@ -1,10 +1,9 @@
-/**
- * File Name:
- *
- * Description:
- *
- *
- */
+/// camerawidgets.dart
+///
+/// Responsible for instantiating the camera, and providing the user with a
+/// camera view and a button to take a picture. Also provides the user with a
+/// view of the captured image and the option to retake the picture.
+///
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +11,10 @@ import 'dart:io';
 import 'dart:developer' as dev;
 import 'package:image_picker/image_picker.dart';
 
-/**
-   Take Picture Screen Class | 
-   Purpose: Constructs and Contains the Take Picture Screen state and has the camera instantiation
- */
+/// TakePictureScreen Class
+///
+/// Purpose: Constructs and contains the TakePictureScreen State and
+/// instantiates the camera.
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     Key? key,
@@ -28,19 +27,18 @@ class TakePictureScreen extends StatefulWidget {
   TakePictureScreenState createState() => TakePictureScreenState();
 }
 
-/**
- * TakePictureScreenState | 
- * Purpose: A screen that allows users to take a picture using a given camera.
- */
+/// TakePictureScreenState
+///
+/// Purpose: Screen that allows users to take a picture using a given camera.
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
 
   @override
   void initState() {
-      super.initState();
-      // To display the current output from the Camera,
-      // create a CameraController.
+    super.initState();
+    // To display the current output from the Camera,
+    // create a CameraController.
     _cameraController = CameraController(
       // Get a specific camera from the list of available cameras.
       widget.camera,
@@ -52,10 +50,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     _initializeControllerFuture = _cameraController.initialize();
   }
 
-/**
- * dispose() | 
- * Purpose: Invoked when we have finished using the camera.
- */
+  /// dispose
+  ///
+  /// Purpose: Invoked when we have finished using the camera.
   @override
   void dispose() {
     // Dispose of the controller when the widget is disposed.
@@ -63,21 +60,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     super.dispose();
   }
 
-/**
- * Returns a Scaffold to provide basic visual layout, contains the feed from the
- * camera and a FloatingActionButton which takes the photo.
- */
+  /// TakePictureScreenState build()
+  ///
+  /// Purpose: Returns a Scaffold to provide basic visual layout, and contains
+  /// the feed from the camera and a FloatingActionButton in the bottom-center
+  /// of the screen which takes the photo
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Take a Picture'),
-        centerTitle: true,
+          title: const Text('Take a Picture'),
+          centerTitle: true,
           actions: <Widget>[
             IconButton(
-            icon: const Icon(Icons.image),
-            tooltip: 'Select Image',
-            onPressed: () {
+              icon: const Icon(Icons.image),
+              tooltip: 'Select Image',
+              onPressed: () {
                 var _picker = ImagePicker();
                 var image = null;
                 try {
@@ -93,14 +91,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                   });
                 }
                 Navigator.pop(context, image);
-            },
-          ),
-        ]
-      ),
+              },
+            ),
+          ]),
 
       // You must wait until the controller is initialized before displaying the
-      // camera preview. Use a FutureBuilder to display a loading spinner until the
-      // controller has finished initializing.
+      // camera preview. Use a FutureBuilder to display a loading spinner until
+      // the controller has finished initializing.
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
@@ -134,17 +131,16 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         },
         child: const Icon(Icons.camera_alt),
         backgroundColor: Colors.blue,
-
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
 
-/**
- * DisplayPictureScreen Class
- * Purpose: Contructs and contains the state for DisplayPictureScreen
- */
+/// DisplayPictureScreen Class
+///
+/// Purpose: Constructs and contains the state for DisplayPictureScreen
+///
 class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
   const DisplayPictureScreen({Key? key, required this.imagePath})
@@ -154,12 +150,11 @@ class DisplayPictureScreen extends StatefulWidget {
   State<DisplayPictureScreen> createState() => _DisplayPictureScreen();
 }
 
-// A widget that displays the picture taken by the user.
-/**
- * DisplayPictureScreen | 
- * Creates a widget that presents the user with the image they have
- * taken as well as the option to continue, or retake the image.
- */
+/// DisplayPictureScreen
+///
+/// Purpose: Creates a widget that presents the user with the image thay have
+/// taken as well as the option to continue or retake the image.
+///
 class _DisplayPictureScreen extends State<DisplayPictureScreen> {
   int _selectedIndex = 0;
 

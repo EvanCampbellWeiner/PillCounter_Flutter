@@ -1,14 +1,49 @@
+/// classifier.dart
+///
+/// Responsible for instantiation of and running the Interpreter, the object
+/// that holds the TfLite model.
+/// Also preprocesses a given image before running the model on it, and
+/// maintains a list of the recognitions that the model has made.
+///
 
 import 'dart:math';
 import 'dart:ui';
 import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as imageLib;
 import 'package:pillcounter_flutter/tflite/recognition.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
-/// Classifier
+
+/// Classifier Class
+///
+///
+/// Contains:
+///
+///     - MODEL_FILE_NAME, LABEL_FILE_NAME: The file names of the tflite model
+///       and class names associated with the model.
+///
+///     - _interpreter: An Interpreter object that contains the tflite model.
+///
+///     - _labels: A List<String> object that contains the class names for the
+///       model.
+///
+///     - INPUT_SIZE: The input size of the image.
+///
+///     - THRESHOLD: The result score threshold.
+///
+///     - imageProcesser: An ImageProcessor object that pre-processes the image.
+///
+///     - padSize: Integer with which to apply padding to transform the image
+///       into a square.
+///
+///     - _outputShapes: A List<List<int>> object that contains the shapes of
+///       the output tensors.
+///
+///     - _outputTypes: A List<TfLiteType> object containing the types of output
+///       tensors.
+///
+///     - NUM_RESULTS: The number of results to show
 class Classifier {
   /// Instance of Interpreter
   Interpreter? _interpreter;
@@ -35,18 +70,26 @@ class Classifier {
   late List<List<int>> _outputShapes;
 
   /// Types of output tensors
- late  List<TfLiteType> _outputTypes;
+  late List<TfLiteType> _outputTypes;
 
   /// Number of results to show
   static const int NUM_RESULTS = 150;
 
+  /// Classifier Constructor
+  ///
+  /// Purpose: Manages loading of the model and labels into the Classifier object.
   Classifier() {
     loadModel();
     loadLabels();
   }
 
-  /// Loads interpreter from asset
-  Future<void> loadModel({Interpreter? interpreter})  async {
+  /// loadModel
+  ///
+  /// Purpose: Loads the model from the "assets/" folder as an Interpreter
+  /// object.
+  ///
+  /// Returns: nothing
+  Future<void> loadModel({Interpreter? interpreter}) async {
     try {
       _interpreter = interpreter ??
           await Interpreter.fromAsset(
@@ -69,10 +112,10 @@ class Classifier {
     }
   }
 
-  /// Loads labels from assets
-  void loadLabels({
-
-    List<String>? labels}) async {
+  /// loadLabels
+  ///
+  /// Purpose: Loads the labels from the assets/ folder into _labels
+  void loadLabels({List<String>? labels}) async {
     try {
       _labels =
           labels ?? await FileUtil.loadLabels("assets/" + LABEL_FILE_NAME);
@@ -81,23 +124,31 @@ class Classifier {
     }
   }
 
-  /// Pre-process the image
+  /// getProcessedImage
+  ///
+  /// Purpose: Manages an ImageProcessor object and pre-processes the passed
+  /// image
+  ///
+  /// Returns: A pre-processed image as a TensorImage object.
   TensorImage getProcessedImage(TensorImage inputImage) {
-    imageProcessor = ImageProcessorBuilder()
-          .build();
+    imageProcessor = ImageProcessorBuilder().build();
     inputImage = imageProcessor.process(inputImage);
     return inputImage;
   }
 
-
-  /// Runs object detection on the input image
+  /// predict
+  ///
+  /// Purpose: Manages the pre-processing and object detection on the passed
+  /// image.
+  ///
+  /// Returns a List of Recognition objects, List\<Recognition>, representing
+  /// the pills that the model has detected.
   Future<List<dynamic>?> predict(imageLib.Image image) async {
     // Create TensorImage from image
-   TensorImage  inputImage = TensorImage(TfLiteType.uint8);
-   inputImage.loadImage(image);
+    TensorImage inputImage = TensorImage(TfLiteType.uint8);
+    inputImage.loadImage(image);
     // Pre-process TensorImage
     inputImage = getProcessedImage(inputImage);
-
 
     // TensorBuffers for output tensors
     TensorBuffer outputLocations = TensorBufferFloat(_outputShapes[1]);
@@ -106,7 +157,6 @@ class Classifier {
     TensorBuffer numLocations = TensorBufferFloat(_outputShapes[2]);
 
     var inputs = inputImage.buffer.asUint8List();
-
 
     // dev.log("Input Tensors are: " + _interpreter!.getInputTensors().toString());
     // dev.log("Input Shape is:" + inputs.shape.toString());
@@ -129,10 +179,8 @@ class Classifier {
     // dev.log("Output Hash Map: "+ outputs.runtimeType.toString());
     // dev.log("Output Shape: "+outputs[0]!.toString());
 
-
     // run inference
     _interpreter!.runForMultipleInputs([inputs], outputs);
-
 
     var inferenceTimeElapsed =
         DateTime.now().millisecondsSinceEpoch - inferenceTimeStart;
@@ -143,7 +191,7 @@ class Classifier {
     // Using bounding box utils for easy conversion of tensorbuffer to List<Rect>
     List<Rect> locations = BoundingBoxUtils.convert(
       tensor: outputLocations,
-      valueIndex: [1,0, 3,2],
+      valueIndex: [1, 0, 3, 2],
       boundingBoxAxis: 2,
       boundingBoxType: BoundingBoxType.BOUNDARIES,
       coordinateType: CoordinateType.RATIO,
@@ -156,14 +204,14 @@ class Classifier {
       // Prediction score
       var score = outputScores.getDoubleValue(i);
 
-      if(score > THRESHOLD) {
+      if (score > THRESHOLD) {
         // inverse of rect
         // [locations] corresponds to the image size 300 X 300
         // inverseTransformRect transforms it our [inputImage]
         Rect transformedRect = imageProcessor.inverseTransformRect(
-        locations[i], inputImage.height, inputImage.width);
+            locations[i], inputImage.height, inputImage.width);
         recognitions.add(
-        Recognition(i, "pill", score, transformedRect),
+          Recognition(i, "pill", score, transformedRect),
         );
       }
     }

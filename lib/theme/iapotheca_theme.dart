@@ -1,3 +1,8 @@
+/// iapotheca_theme.dart
+///
+/// Contains the style rules for various widgets used in the app.
+///
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

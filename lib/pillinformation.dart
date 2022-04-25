@@ -1,4 +1,25 @@
-// ignore_for_file: slash_for_doc_comments
+/// pillinformation.dart
+///
+/// Contains build method and supporting functions for the DIN Input and
+/// Pill Information pages.
+/// The Pill Information page is used in two seperate contexts, the first of
+/// which is:
+///     1. The DIN Input page consists of a single 8-digit input which is then
+///        taken and sent to the Canadian Drug Database.
+///     2. The user is then moved to the Pill Information screen with
+///        pre-populated form elements.
+///     3. After accepting the contents of the PillInformation page, the user is
+///        then moved to the Pill Counting screen.
+///
+/// The alternative flow for the app is:
+///     1. The user was previously on the Session Report page (report.dart) and
+///        tapped on an element from the list.
+///     2. The app then sends the PillInformation object and it's index in the
+///        Session Report, a List<PillInformation>, to the Pill Information
+///        screen.
+///     3. The user is then moved to the Pill Information screen, which has been
+///        pre-populated using the passed PillInformation object
+///
 
 import 'dart:async';
 import 'dart:convert';
@@ -11,10 +32,10 @@ import 'pillcounter.dart';
 import 'dart:developer' as dev;
 import 'report.dart';
 
-/**
-   Pill Information Class (Object)
-   Purpose: Holds all of the information for a single pill type / count.
- */
+/// PillInformation Class
+///
+/// Purpose: Holds all of the information for a single pill type / count.
+///
 class PillInformation {
   final String din;
   final String description;
@@ -29,6 +50,14 @@ class PillInformation {
     this.count = 0,
   });
 
+  /// PillInformation.fromJson
+  ///
+  /// Purpose: Accepts a json string representing a PillInformation object and
+  /// calls the PillInformation constructor to create a PillInformation object,
+  /// then returns it.
+  ///
+  /// Returns: A PillInformation object
+  ///
   factory PillInformation.fromJson(Map<String, dynamic> json) {
     return PillInformation(
       din: json['drug_identification_number'],
@@ -37,26 +66,54 @@ class PillInformation {
     );
   }
 
+  /// toMap
+  ///
+  /// Purpose: Maps a PillInformation object to a JSON string.
+  ///
+  /// Returns: a json-formatted string representing the passed PillInformation
+  /// object.
+  ///
   static Map<String, dynamic> toMap(PillInformation pill) => {
         'drug_identification_number': pill.din,
         'brand_name': pill.description,
         'count': pill.count,
       };
 
+  /// encode
+  ///
+  /// Purpose: Accepts a List of PillInformation objects and converts them to a
+  /// json string.
+  ///
+  /// Returns: A json string.
   static String encode(List<PillInformation> Pills) => json.encode(
         Pills.map<Map<String, dynamic>>((pill) => PillInformation.toMap(pill))
             .toList(),
       );
 
+  /// decode
+  ///
+  /// Purpose: Accepts a json-formatted String and converts it to a List of
+  /// PillInformation objects.
+  ///
+  /// Returns: A List of PillInformation objects
   static List<PillInformation> decode(String pills) =>
       (json.decode(pills) as List<dynamic>)
           .map<PillInformation>((item) => PillInformation.fromJson(item))
           .toList();
 }
 
-// Providing http.Client allows the application to provide the correct http.Client
-// depending on the situation/device you are using.
-// Flutter + Server-side projects: provide a http.IOClient
+/// fetchPillInformation
+///
+/// Purpose: Provided a pill DIN and a http.Client object, send a request to the
+/// Canadian Drug Database API. Given a valid response, convert the respnnse to
+/// a PillInformation object and return it.
+///
+/// Returns: A Future<PillInformation> object.
+///
+/// Note:
+/// Providing http.Client allows the application to provide the correct
+/// http.Client depending on the situation/device you are using.
+/// Flutter + Server-side projects: provide a http.IOClient
 Future<PillInformation> fetchPillInformation(
     String din, http.Client client) async {
   try {
@@ -76,10 +133,10 @@ Future<PillInformation> fetchPillInformation(
   }
 }
 
-/**
-   Pill Information Review Class
-   Purpose: Constructs and contains the state for the pill information review page
-*/
+/// Pill Information Review Class
+///
+/// Purpose: Constructs and contains the state for the pill information
+/// review page
 class PillInformationReview extends StatefulWidget {
   PillInformationReview({
     Key? key,
@@ -89,10 +146,9 @@ class PillInformationReview extends StatefulWidget {
   _PillInformationReviewState createState() => _PillInformationReviewState();
 }
 
-/**
-   Pill Information Review State
-   Purpose: Creates a form to allow users to review pill information 
- */
+/// Pill Information Review State
+///
+/// Purpose: Creates a form to allow users to review pill information
 class _PillInformationReviewState extends State<PillInformationReview> {
   final _dinTextInputController = TextEditingController();
   final _descTextInputController = TextEditingController();
@@ -218,12 +274,10 @@ class _PillInformationReviewState extends State<PillInformationReview> {
   }
 }
 
-/**
-
-  Pill Information DIN Component
-  Purpose: A component that has a textfield for a DIN and a button to retrieve results.
-
-*/
+/// Pill Information DIN Component
+///
+/// Purpose: A component that has a textfield for a DIN and a button to retrieve
+/// results.
 class DINInputFormState extends State<DINInputForm> {
   // Contains the form state
   final _formKey = GlobalKey<FormState>();
@@ -296,12 +350,10 @@ class DINInputFormState extends State<DINInputForm> {
   }
 }
 
-/**
-
-    Pill Information DIN Component Stateless
-    Purpose: A component that has a textfield for a DIN and will gather api information based on the inputted value.
-
- */
+/// Pill Information DIN Component Stateless
+///
+/// Purpose: A component that has a textfield for a DIN and will gather api
+/// information based on the user's input.
 class DINInputForm extends StatefulWidget {
   const DINInputForm({Key? key}) : super(key: key);
 
@@ -311,6 +363,9 @@ class DINInputForm extends StatefulWidget {
   }
 }
 
+/// ScreenArguments Class
+///
+/// Purpose: Used to pass arguments from one screen to another.
 class ScreenArguments {
   final PillInformation pInfo;
   final int? ind;

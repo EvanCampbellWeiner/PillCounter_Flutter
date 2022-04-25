@@ -1,8 +1,19 @@
+/// pillcounter.dart
+///
+/// Responsible for the loading the device's camera, displaying it to the user
+/// and saving the captured image. The image is then resized and run through the
+/// TfLite model. Predictions on where the pills in the image may be located are
+/// saved to a List<Recognition> object and then displayed to the user as dots.
+/// These dots are scalable in size, their colour can be changed, and the user
+/// may tap on them to remove them from the _recognitions List.
+///
+/// Once the user is satisfied with the pill count, they may move to the Session
+/// Report Screen using the Save Icon in the App Bar.
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:developer' as dev;
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:pillcounter_flutter/pillinformation.dart';
@@ -46,9 +57,16 @@ class _PillCounterState extends State<PillCounter> {
     _busy = true;
   }
 
+  /// loadCamera
+  ///
+  /// Purpose: Get a list of the cameras available on the device, and choose the
+  /// first available camera.
+  ///
+  /// Returns: Returns a Future<CameraDescription>
+  ///
   Future<CameraDescription> loadCamera() async {
     // Ensure that plugin services are initialized so that `availableCameras()`
-    // can be called before `runApp()`
+    //can be called
     WidgetsFlutterBinding.ensureInitialized();
 
     // // Obtain a list of the available cameras on the device.
@@ -59,6 +77,12 @@ class _PillCounterState extends State<PillCounter> {
     return firstCamera;
   }
 
+  /// predictImage
+  ///
+  /// Purpose: Manages the running of the model on the image and throws an
+  /// Exception if the model is not selected. Also creates a FileImage object,
+  /// and calls setState, rebuilding the page.
+  ///
   Future predictImage(File image) async {
     if (image == null) return;
     // Add Other Models to Switch
@@ -91,6 +115,14 @@ class _PillCounterState extends State<PillCounter> {
     });
   }
 
+  /// runModel
+  ///
+  /// Purpose: Manages the conversion of the given image and the running of the
+  /// model on that image. Given an image, convert it into a Uint8List object,
+  /// decode it, and resize it to fit INPUT_SIZE parameter of the model. Then
+  /// instantiate a Classifier and load and run the model on the resized image,
+  /// collecting the results in the _recognitions List.
+  ///
   Future runModel(File image) async {
     int startTime = new DateTime.now().millisecondsSinceEpoch;
     var imageb = (await image.readAsBytes());
@@ -109,6 +141,19 @@ class _PillCounterState extends State<PillCounter> {
     _count = _recognitions.length;
   }
 
+  /// renderBoxes
+  ///
+  /// Purpose: Displays the recognitions from the _recognitions array. These
+  /// recognitions are displayed using a
+  /// List of Positioned(GestureDetector(Container)) Widgets that have circular
+  /// borders and are stacked ontop of the image chosen by the user.
+  ///
+  /// If one of these Positioned(GestureDetector(Container)) Widgets is tapped,
+  /// the Recognition it represents is removed from the _recognitions array and
+  /// setState() is called. Ultimately, this means that the point is effectively
+  /// removed on tap.
+  ///
+  /// Returns: Returns a List of Positioned(GestureDetector(Container)) Widgets.
   List<Widget> renderBoxes(Size screen) {
     if (_recognitions == null) return [];
     if (_imageHeight == null || _imageWidth == null) return [];
@@ -147,6 +192,11 @@ class _PillCounterState extends State<PillCounter> {
     }).toList();
   }
 
+  /// showCamera
+  ///
+  /// Purpose: Take the user to the TakePictureScreen, passing the returned
+  /// CameraDescription from loadCamera as an argument. Then return to this page
+  /// and run the model on the the image.
   showCamera() async {
     var camera = await loadCamera();
     var image = await Navigator.push(
@@ -168,6 +218,13 @@ class _PillCounterState extends State<PillCounter> {
     }
   }
 
+  /// onTapEvent
+  ///
+  /// Purpose: Adds a recognition to the recognitions array and calls setState,
+  /// rebuilding the Pill Counter screen, which displays the newly added
+  /// Recognition on top of the previous ones.
+  ///
+  /// Returns: nothing
   void onTapEvent(BuildContext context, TapDownDetails details) {
     final RenderObject? box = context.findRenderObject();
     if (box is RenderBox) {
@@ -183,6 +240,11 @@ class _PillCounterState extends State<PillCounter> {
     }
   }
 
+  /// getColour
+  ///
+  /// Purpose: Given a colour from the enum PointColour, return a Color object.
+  ///
+  /// Returns: A Colour object.
   Color getColour(pointColour? colour) {
     Color clr = Colors.blue;
     switch (colour) {
@@ -273,7 +335,6 @@ class _PillCounterState extends State<PillCounter> {
             style: TextStyle(fontSize: 18),
           ),
         ),
-
         Container(
             alignment: Alignment.bottomLeft,
             child: Slider(
@@ -289,7 +350,6 @@ class _PillCounterState extends State<PillCounter> {
           "Point Colour",
           style: TextStyle(fontSize: 18),
         ),
-
         Row(children: <Widget>[
           Expanded(
               child: Radio<pointColour>(
@@ -341,7 +401,7 @@ class _PillCounterState extends State<PillCounter> {
         ])
       ]),
       floatingActionButton: FloatingActionButton(
-        backgroundColor:Colors.blue,
+        backgroundColor: Colors.blue,
         onPressed: () async {
           showCamera();
         },
