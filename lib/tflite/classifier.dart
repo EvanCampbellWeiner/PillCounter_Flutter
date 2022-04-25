@@ -55,7 +55,7 @@ class Classifier {
   /// Labels file loaded as list
   List<String>? _labels;
 
-  static const String MODEL_FILE_NAME = "model2.tflite";
+  static const String MODEL_FILE_NAME = "model.tflite";
   static const String LABEL_FILE_NAME = "model.txt";
 
   /// Input size of image (height = width = 384)
@@ -161,6 +161,7 @@ class Classifier {
     TensorBuffer numLocations = TensorBufferFloat(_outputShapes[2]);
 
     var inputs = inputImage.buffer.asUint8List();
+    dev.log(MODEL_FILE_NAME+"GIIIIIIII");
 
     // dev.log("Input Tensors are: " + _interpreter!.getInputTensors().toString());
     // dev.log("Input Shape is:" + inputs.shape.toString());
