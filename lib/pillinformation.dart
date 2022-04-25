@@ -205,7 +205,10 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 25),
+            const Divider(
+              height:25,
+              color:Colors.white,
+            ),
             TextFormField(
               controller: _descTextInputController,
               keyboardType: TextInputType.text,
@@ -216,7 +219,10 @@ class _PillInformationReviewState extends State<PillInformationReview> {
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 25),
+            const Divider(
+              height:25,
+              color:Colors.white,
+            ),
             TextField(
               //enabled: false,
               controller: _cntTextInputController,
