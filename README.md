@@ -1,6 +1,8 @@
 # CountrAI
 
-A Pill Counting Mobile Application built using tflite and flutter
+A Pill Counting Mobile Application built using tflite and flutter.
+
+Checkout the Wiki for more information 
 
 ## Background
 
