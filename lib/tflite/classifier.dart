@@ -58,7 +58,7 @@ class Classifier {
   static const String MODEL_FILE_NAME = "model2.tflite";
   static const String LABEL_FILE_NAME = "model.txt";
 
-  /// Input size of image (height = width = 300)
+  /// Input size of image (height = width = 384)
   static const int INPUT_SIZE = 384;
 
   /// Result score threshold
