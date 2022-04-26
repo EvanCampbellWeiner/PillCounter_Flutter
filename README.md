@@ -72,7 +72,7 @@ Reference: Tflite_Flutter[https://pub.dev/packages/tflite_flutter]
 
 
 
-Created For:
+Originally created For:
 - [iApotheca Healthcare](https://iapotheca.com)
 - [Trent_University](https://trentu.ca)
 
