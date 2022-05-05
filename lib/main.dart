@@ -1,10 +1,10 @@
 /// CountrAI
 ///
 /// Created by: Nicholas Barnes, Evan Campbell-Weiner, Myles Lee and Kyle Burke
-/// as a capstone project for Trent University and iApotheca.
+/// as a capstone project for Trent University and a client.
 ///
 /// Description: Created as a capstone project for Trent University and
-/// iApotheca. This mobile application was created with the goal of providing
+/// a client. This mobile application was created with the goal of providing
 /// pharmacies with an affordable, portable and intuitive tool to count pills.
 ///
 /// Using a COCO SSD MobileNet v1 model and transfer learning, our model as been
@@ -25,7 +25,7 @@
 ///
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'theme/iapotheca_theme.dart';
+import 'theme/theme.dart';
 import 'pillinformation.dart';
 import 'report.dart';
 
@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final theme = iApothecaTheme.light();
+    final theme = AppTheme.light();
     return MaterialApp(
       theme: theme,
       title: 'CountrAI',
@@ -77,7 +77,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = iApothecaTheme.light();
+    final theme = AppTheme.light();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pill Counter'),

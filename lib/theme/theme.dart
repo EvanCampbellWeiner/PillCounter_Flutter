@@ -1,4 +1,4 @@
-/// iapotheca_theme.dart
+/// theme.dart
 ///
 /// Contains the style rules for various widgets used in the app.
 ///
@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ignore: camel_case_types
-class iApothecaTheme {
+class AppTheme {
   // 1
   static TextTheme lightTextTheme = TextTheme(
     bodyText1: GoogleFonts.rubik(
